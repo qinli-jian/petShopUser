@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://qin.qins.online:3306/xiaoGangTongXue
+    url: jdbc:mysql://qin.qins.online:3306/petShop
     username: root
     password: root@@@###
     driver-class-name: com.mysql.cj.jdbc.Driver
