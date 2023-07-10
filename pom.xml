@@ -52,6 +52,12 @@
             <version>2.3.1</version>
             <scope>test</scope>
         </dependency>
+<!--        cumstomer-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.3</version>
+        </dependency>
     </dependencies>
 
     <build>
