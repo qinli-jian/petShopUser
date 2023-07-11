@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.petshopuser.service.impl.UserServiceImpl;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +26,16 @@ public class UserController {
     @PostMapping("/login")
     public ReturnObj login(@RequestBody Map<String,String> login_form){
         ReturnObj returnObj = new ReturnObj();
+        System.out.println(login_form);
         User user = userService.findUserByAccount(login_form.get("account"));
-        if(user.getAccount().equals(login_form.get("account"))){
+        if(user!=null){
             if(bCryptPasswordEncoder.matches(login_form.get("password"),user.getPassword())){
                 returnObj.setMsg("登陆成功");
                 returnObj.setCode("200");
-                returnObj.setData(Utils.generateToken(user,"user"));
+                String token = Utils.generateToken(user,"user");
+                Map<String, String> data = new HashMap<>();
+                data.put("token",token);
+                returnObj.setData(data);
             }
             else{
                 returnObj.setMsg("密码错误,请重试");
