@@ -46,6 +46,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         User user = userMapper.findUserByPhone(phone);
         return user;
     }
+    public User findUserByAccount(String account){
+        return userMapper.findUserByAccount(account);
+    }
 
     public boolean sendPhoneCode(String phone) {
         String randomCode = Utils.generateRandomCode(6);
