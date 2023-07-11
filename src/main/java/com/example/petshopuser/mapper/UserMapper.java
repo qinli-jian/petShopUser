@@ -13,6 +13,8 @@ public interface UserMapper extends BaseMapper<User> {
 
     User findUserByPhone(String phone);
 
+    User findUserByAccount(String account);
+
     int insert_phoneCode(String id,String code,String phone);
 
     int find_phoneCodeByPhone(String phone);
