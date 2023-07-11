@@ -2,11 +2,12 @@ package com.example.petshopuser.controller;
 
 import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.entity.User;
-import com.example.petshopuser.service.impl.UserServiceImpl;
+import com.example.petshopuser.utils.Utils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.petshopuser.service.impl.UserServiceImpl;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -18,12 +19,26 @@ public class UserController {
 
     @Resource
     private UserServiceImpl userService;
-
     @PostMapping("/login")
     public ReturnObj login(@RequestBody Map<String,String> login_form){
         ReturnObj returnObj = new ReturnObj();
         List<User> allUser = userService.getAllUser();
-        returnObj.setData(allUser);
+        for(int i=0;i<allUser.size();i++){
+            if(allUser.get(i).getAccount().equals(login_form.get("account"))){
+                if(allUser.get(i).getPassword().equals(login_form.get("password"))){
+                    returnObj.setMsg("登陆成功");
+                    returnObj.setCode("200");
+                    returnObj.setData(Utils.generateToken(allUser.get(i),"user"));
+                }
+                else{
+                    returnObj.setMsg("密码错误,请重试");
+                    returnObj.setCode("500");
+                }
+                return returnObj;
+            }
+        }
+        returnObj.setMsg("没有该用户,请注册！");
+        returnObj.setCode("500");
         return returnObj;
     }
 
