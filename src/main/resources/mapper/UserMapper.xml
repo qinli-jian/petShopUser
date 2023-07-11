@@ -6,6 +6,6 @@
         select * from user;
     </select>
     <select id="findUserByPhone" resultType="com.example.petshopuser.entity.User">
-        
+        select * from user where account=#{phone}
     </select>
 </mapper>

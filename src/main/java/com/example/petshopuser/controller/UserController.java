@@ -47,7 +47,14 @@ public class UserController {
         ReturnObj returnObj = new ReturnObj();
         String phone = register_form.get("phone");
         // 检查用户是否存在
-        userService.findUserByPhone(phone);
+        User user = userService.findUserByPhone(phone);
+        if(user!=null){
+            returnObj.setCode("500");
+            returnObj.setMsg("user exist");
+            return returnObj;
+        }
+
+
 
         return returnObj;
     }
