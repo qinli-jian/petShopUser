@@ -21,6 +21,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     public User findUserByPhone(String phone) {
-        userMapper.findUserByPhone(phone);
+        User user = userMapper.findUserByPhone(phone);
+        return user;
     }
 }
