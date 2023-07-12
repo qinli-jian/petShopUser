@@ -2,6 +2,8 @@ package com.example.petshopuser.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.petshopuser.entity.Commodity;
+import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
+import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
 import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
 import com.example.petshopuser.entity.User;
@@ -9,24 +11,14 @@ import com.example.petshopuser.mapper.CommodityMapper;
 import com.example.petshopuser.mapper.UserMapper;
 import com.example.petshopuser.service.IUserService;
 import org.springframework.stereotype.Service;
-import com.example.petshopuser.controller.dto.CommodityCategoryDTO;
-import com.example.petshopuser.controller.dto.CommodityIntroDTO;
-import com.example.petshopuser.entity.Commodity;
-import com.example.petshopuser.mapper.CommodityMapper;
-import com.example.petshopuser.service.ICommodityService;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import javax.annotation.Resource;
-import java.util.List;
 
 @Service
-public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity> implements ICommodityService {
+public class CommodityServiceImpl {
 
     @Resource
     private CommodityMapper commodityMapper;
@@ -41,7 +33,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     public Specification getBySpecificationId(String id) {
         return commodityMapper.getBySpecificationId(id);
     }
-    public List<CommodityIntroDTO> getAllCommodityIntro(int pageNum,int pageSize) {
+    public List<CommodityIntroDTO> getAllCommodityIntro(int pageNum, int pageSize) {
         int offset = pageSize*(pageNum-1);
         List<CommodityIntroDTO> commodityIntroDTOList = commodityMapper.getAllCommodityIntro(offset,pageSize);
         // 查询每个商品的最低规格组合价格

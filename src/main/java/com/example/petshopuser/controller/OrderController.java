@@ -8,7 +8,6 @@ import com.example.petshopuser.entity.User;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
 import com.example.petshopuser.service.impl.UserServiceImpl;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

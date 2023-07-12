@@ -25,10 +25,10 @@
     </resultMap>
     <select id="getBySpecificationId" resultMap="getBySpecificationIdDTO">
         select * from specifications where id = #{id};
+    </select>
 
 
-
-    <resultMap id="commodityIntroDTO" type="com.example.petshopuser.controller.dto.CommodityIntroDTO">
+    <resultMap id="commodityIntroDTO" type="com.example.petshopuser.entity.DTO.CommodityIntroDTO">
         <result column="name" property="name" />
         <result column="id" property="id"/>
         <result column="imgs" property="imgs"/>
@@ -49,7 +49,7 @@
     </select>
 
 
-    <resultMap id="commodityCategoryDTO" type="com.example.petshopuser.controller.dto.CommodityCategoryDTO">
+    <resultMap id="commodityCategoryDTO" type="com.example.petshopuser.entity.DTO.CommodityCategoryDTO">
         <result column="category_name" property="category_name" />
         <result column="id" property="id"/>
         <result column="createTime" property="createTime"/>
