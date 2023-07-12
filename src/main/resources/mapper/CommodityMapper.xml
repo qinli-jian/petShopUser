@@ -25,7 +25,7 @@
     </resultMap>
     <select id="getBySpecificationId" resultMap="getBySpecificationIdDTO">
         select * from specifications where id = #{id};
-
+    </select>
 
 
     <resultMap id="commodityIntroDTO" type="com.example.petshopuser.controller.dto.CommodityIntroDTO">
