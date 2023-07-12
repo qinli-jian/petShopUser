@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/commodity")
@@ -32,27 +31,27 @@ public class CommodityController {
     @Resource
     private CommodityServiceImpl commodityService;
     @PostMapping("/details")
-    public ReturnObj getCommodityById(@RequestBody Map<String,String> request_form){
+    public ReturnObj getCommodityById(@RequestBody Map<String,String> request_form) {
         ReturnObj returnObj = new ReturnObj();
-        Map<String,Object> data = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         Commodity commodity = commodityService.getCommodityById(request_form.get("id"));
-        if(commodity!=null)
-        data.put("commodity",commodity);
-        else{
+        if (commodity != null)
+            data.put("commodity", commodity);
+        else {
             returnObj.setCode("500");
             returnObj.setMsg("error");
             return returnObj;
         }
         List<Specification_price> specification_prices = commodityService.getAllByCommodityId(commodity.getId());
         System.out.println(specification_prices);
-        List<Map<String,Object>> objects = new ArrayList<>();
+        List<Map<String, Object>> objects = new ArrayList<>();
         for (Specification_price specification_price : specification_prices) {
             System.out.println(specification_price.getSpecification_ids());
-            if(specification_price.getSpecification_ids()!=null) {
+            if (specification_price.getSpecification_ids() != null) {
                 String[] temp_ids = specification_price.getSpecification_ids().split(",");
                 List<Specification> specifications = new ArrayList<>();
                 for (String temp_id : temp_ids) {
-                        specifications.add(commodityService.getBySpecificationId(temp_id));
+                    specifications.add(commodityService.getBySpecificationId(temp_id));
                 }
                 Map<String, Object> e = new HashMap<>();
                 e.put("specifications", specifications);
@@ -61,16 +60,14 @@ public class CommodityController {
             }
         }
         data.put("specifications_price", objects);
-        returnObj.setData( data);
+        returnObj.setData(data);
         returnObj.setMsg("success");
         returnObj.setCode("200");
-
-    @Resource
-    private CommodityServiceImpl commodityService;
+        return returnObj;
+    }
 
     @GetMapping("/search")
-    public ReturnObj search(@RequestParam(value = "kw", required = false) String kw,@RequestParam(value = "category_id", required = false)String category_id,
-                            @RequestParam(value = "pageNum")Integer pageNum,@RequestParam(value = "pageSize")Integer pageSize){
+    public ReturnObj search(@RequestParam(value = "kw", required = false) String kw,@RequestParam(value = "category_id", required = false)String category_id,@RequestParam(value = "pageNum")Integer pageNum,@RequestParam(value = "pageSize")Integer pageSize){
         ReturnObj returnObj = new ReturnObj();
         if(pageNum<=0 || pageSize <=0){
             returnObj.setCode(Constants.CODE_400);
