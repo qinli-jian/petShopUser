@@ -38,8 +38,9 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     public List<Specification_price> getAllByCommodityId(String commodity_id){
         return commodityMapper.getAllByCommodityId(commodity_id);
     }
-    public Specification getBySpecificationId(String id){
+    public Specification getBySpecificationId(String id) {
         return commodityMapper.getBySpecificationId(id);
+    }
     public List<CommodityIntroDTO> getAllCommodityIntro(int pageNum,int pageSize) {
         int offset = pageSize*(pageNum-1);
         List<CommodityIntroDTO> commodityIntroDTOList = commodityMapper.getAllCommodityIntro(offset,pageSize);
