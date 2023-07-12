@@ -43,6 +43,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return allUser;
     }
 
+    public User getUserById(String id){
+        return userMapper.getUserById(id);
+    }
+
     public User findUserByPhone(String phone) {
         User user = userMapper.findUserByPhone(phone);
         return user;
