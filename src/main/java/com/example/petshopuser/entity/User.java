@@ -44,4 +44,15 @@ public class User {
         this.password = password;
         this.address = address;
     }
+    public User(String id, String avatar, String name, String sex, String age, String account, String phone, String address) {
+        this.id = id;
+        this.avatar = avatar;
+        this.name = name;
+        this.sex = sex;
+        this.age = age;
+        this.account = account;
+        this.phone = phone;
+        this.password = password;
+        this.address = address;
+    }
 }

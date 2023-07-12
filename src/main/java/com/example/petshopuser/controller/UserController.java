@@ -114,7 +114,7 @@ public class UserController {
     public ReturnObj get_phone_code(@RequestBody Map<String,String> register_form){
         ReturnObj returnObj = new ReturnObj();
         String phone = register_form.get("phone");
-        if(phone.isEmpty()||phone==null){
+        if(phone==null || phone.isEmpty()){
             returnObj.setCode(Constants.CODE_400);
             returnObj.setMsg("error");
             return returnObj;
@@ -136,6 +136,39 @@ public class UserController {
             returnObj.setCode("500");
             returnObj.setMsg("failed");
         }
+        System.out.println("====注册");
+        System.out.println(returnObj);
+        return returnObj;
+    }
+
+    @PostMapping("/get_reset_phone_code")
+    public ReturnObj get_reset_phone_code(@RequestBody Map<String,String> register_form){
+        ReturnObj returnObj = new ReturnObj();
+        String phone = register_form.get("account");
+        if(phone==null || phone.isEmpty()){
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("error");
+            return returnObj;
+        }
+        // 检查用户是否存在
+        User user = userService.findUserByPhone(phone);
+        if(user==null){
+            returnObj.setCode("500");
+            returnObj.setMsg("user not exist");
+            return returnObj;
+        }
+
+        // 用户存在就可以发送验证码
+        boolean b = userService.sendPhoneCode(phone);
+        if(b){
+            returnObj.setCode("200");
+            returnObj.setMsg("success");
+        }else{
+            returnObj.setCode("500");
+            returnObj.setMsg("failed");
+        }
+        System.out.println("====重设密码");
+        System.out.println(returnObj);
         return returnObj;
     }
 
@@ -182,6 +215,71 @@ public class UserController {
             returnObj.setCode(Constants.CODE_200);
             returnObj.setMsg("params success");
         }
+        return returnObj;
+    }
+
+    @PostMapping("/resetPassword")
+    public ReturnObj resetPassword(@RequestBody Map<String,String> reset_form){
+        ReturnObj returnObj = new ReturnObj();
+        String account = reset_form.get("account");
+        String code = reset_form.get("code");
+        String password = reset_form.get("password");
+        String repassword = reset_form.get("repassword");
+        if(account==null || password==null || repassword==null || code==null){
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("参数错误");
+            return returnObj;
+        }
+        //对比密码
+        if(!repassword.equals(password)){
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("密码不一致");
+            return returnObj;
+        }
+        // 检查用户是否存在
+        User user = userService.findUserByPhone(account);
+        if(user==null){
+            returnObj.setCode(Constants.CODE_600);
+            returnObj.setMsg("user not exist");
+            return returnObj;
+        }
+        // 检验验证码
+        int check_flag = userService.check_phoneCode(account,code);
+        if(check_flag==0){
+            returnObj.setMsg("code error");
+            returnObj.setCode(Constants.CODE_400);
+            return returnObj;
+        } else if (check_flag==-1) {
+            returnObj.setMsg("code time out");
+            returnObj.setCode(Constants.CODE_400);
+            return returnObj;
+        }
+
+        // 更新密码
+        int reset_flag = userService.resetPassword(account,password);
+        if(reset_flag==1){
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("修改成功");
+        }else {
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("修改失败，请联系管理员");
+        }
+        return returnObj;
+    }
+
+    @PostMapping("/addaddress")
+    public ReturnObj addaddress(@RequestBody Map<String,String> address_form){
+        ReturnObj returnObj = new ReturnObj();
+
+        String user_id = address_form.get("user_id");
+        String address = address_form.get("address");
+        if(user_id==null || address==null){
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("参数错误");
+        }
+        // 根据user_id进行insertaddress
+        int flag = userService.addAddress(user_id,address);
+
         return returnObj;
     }
 
