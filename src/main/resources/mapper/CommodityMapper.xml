@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.petshopuser.mapper.CommodityMapper">
+    <select id="getCommodityById" resultType="com.example.petshopuser.entity.Commodity">
+        select * from commodity where id = #{id};
+    </select>
+    <resultMap id="getAllByCommodityIdDTO" type="com.example.petshopuser.entity.Specification_price">
+        <result column="id" property="id" />
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="specification_ids" property="specification_ids"/>
+        <result column="price" property="price"/>
+    </resultMap>
+    <select id="getAllByCommodityId" resultMap="getAllByCommodityIdDTO">
+        select * from specification_price where commodity_id = #{commodity_id};
+    </select>
+    <resultMap id="getBySpecificationIdDTO" type="com.example.petshopuser.entity.Specification">
+        <result column="id" property="id" />
+        <result column="specification_name" property="specification_name"/>
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="type" property="type"/>
+        <result column="inventory" property="inventory"/>
+        <result column="sales_volume" property="sales_volume"/>
+        <result column="create_time" property="create_time"/>
+        <result column="images" property="images"/>
+    </resultMap>
+    <select id="getBySpecificationId" resultMap="getBySpecificationIdDTO">
+        select * from specifications where id = #{id};
+    </select>
+</mapper>
