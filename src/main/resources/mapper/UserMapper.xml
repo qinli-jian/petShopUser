@@ -40,6 +40,8 @@
     <select id="findUserByAccount" resultType="com.example.petshopuser.entity.User">
         select * from user where account = #{account};
     </select>
+    <select id="getUserById" resultType="com.example.petshopuser.entity.User">
+        select * from user where id = #{id}
     <select id="getUserInfoByPhone" resultType="com.example.petshopuser.entity.User">
         select * from user where account=#{phone}
     </select>
