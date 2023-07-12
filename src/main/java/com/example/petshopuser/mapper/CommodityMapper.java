@@ -6,8 +6,8 @@ import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import com.example.petshopuser.controller.dto.CommodityCategoryDTO;
-import com.example.petshopuser.controller.dto.CommodityIntroDTO;
+import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
+import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
