@@ -37,12 +37,12 @@
     </resultMap>
 
     <select id="getAllCommodityIntro" resultMap="commodityIntroDTO">
-        select * from commodity;
+        select * from commodity limit #{offset},#{pageSize}
     </select>
     <select id="getCommodityIntroByKW" resultMap="commodityIntroDTO">
         SELECT *
         FROM commodity
-        WHERE name LIKE CONCAT('%', #{kw}, '%')
+        WHERE name LIKE CONCAT('%', #{kw}, '%') limit #{offset},#{pageSize}
     </select>
     <select id="getCommodityMinPrice" resultType="java.math.BigDecimal">
         SELECT MIN(price) AS min_price FROM specification_price WHERE commodity_id = #{id}
@@ -58,5 +58,29 @@
     </resultMap>
     <select id="getCategoryById" resultMap="commodityCategoryDTO">
         select * from commodity_categories where id=#{categoryId}
+    </select>
+    <select id="getAll2Category" resultMap="commodityCategoryDTO">
+        select * from commodity_categories where level = 2
+    </select>
+    <select id="getAll1Category" resultMap="commodityCategoryDTO">
+        select * from commodity_categories where level = 1
+    </select>
+    <select id="getChildCategoryByPlevel" resultMap="commodityCategoryDTO">
+        select * from commodity_categories where p_level_id = #{p_level_id} and level=2
+    </select>
+    <select id="getCommodityIntroByCategoryId" resultMap="commodityIntroDTO">
+        select * from commodity order by create_time desc limit #{offset}, #{pageSize}
+    </select>
+    <select id="getCommodityIntroByCategoryIdList" resultMap="commodityIntroDTO">
+        SELECT *
+        FROM commodity_categories
+        WHERE category_id IN
+        <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        ORDER BY create_time DESC limit #{offset}, #{pageSize}
+    </select>
+    <select id="getCommodityIntrosByCategoryId_Kw" resultMap="commodityIntroDTO">
+
     </select>
 </mapper>

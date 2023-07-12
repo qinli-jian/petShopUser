@@ -8,11 +8,18 @@
         INSERT INTO user (id,avatar,name,sex,age,account,password,address,phone)
         VALUES (#{id},#{avatar},#{name},#{sex},#{age},#{account},#{password},#{address},#{phone});
     </insert>
+    <insert id="insert_userAddress">
+        INSERT INTO user (id,user_id,addressee,province,city,county,detailed_address,postcode,phone,defaultAddress)
+        VALUES (#{id},#{user_id},#{addressee},#{province},#{city},#{county},#{detailed_address},#{postcode},#{phone},#{defaultAddress});
+    </insert>
     <update id="update_phoneCode">
         update phone_Code set time=CURRENT_TIMESTAMP,code=#{code} where phone=#{phone}
     </update>
     <update id="update_userProfile">
         update user set name=#{name},sex=#{sex},age=#{age},address=#{address},avatar=#{avatar} where account=#{phone} and id=#{id}
+    </update>
+    <update id="update_resetUserPassword">
+        update user set password = #{password} where account=#{account}
     </update>
 
     <select id="getAllUser" resultType="com.example.petshopuser.entity.User">
