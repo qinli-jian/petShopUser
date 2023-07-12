@@ -28,4 +28,11 @@ public interface UserMapper extends BaseMapper<User> {
     int addUser(User user);
 
     Timestamp get_phoneCodeTimeByPhone(String phone);
+
+    User getUserInfoByPhone(String phone);
+
+    User getUserInfoByUserId(String user_id);
+
+    int update_userProfile(User user);
+
 }
