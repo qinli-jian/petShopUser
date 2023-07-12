@@ -4,25 +4,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.petshopuser.entity.Commodity;
 import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
-import com.example.petshopuser.entity.User;
 import com.example.petshopuser.mapper.CommodityMapper;
-import com.example.petshopuser.mapper.UserMapper;
-import com.example.petshopuser.service.IUserService;
 import org.springframework.stereotype.Service;
-import com.example.petshopuser.controller.dto.CommodityCategoryDTO;
-import com.example.petshopuser.controller.dto.CommodityIntroDTO;
-import com.example.petshopuser.entity.Commodity;
-import com.example.petshopuser.mapper.CommodityMapper;
+import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
+import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
 import com.example.petshopuser.service.ICommodityService;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Resource;
 import java.util.List;
 
 @Service

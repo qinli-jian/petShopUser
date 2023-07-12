@@ -1,4 +1,4 @@
-package com.example.petshopuser.controller.dto;
+package com.example.petshopuser.entity.DTO;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

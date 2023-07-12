@@ -1,7 +1,7 @@
 package com.example.petshopuser.controller;
 
 import com.example.petshopuser.common.Constants;
-import com.example.petshopuser.controller.dto.CommodityCategoryDTO;
+import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
 import com.example.petshopuser.entity.Commodity;
 import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.entity.Specification;
@@ -9,10 +9,7 @@ import com.example.petshopuser.entity.Specification_price;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.example.petshopuser.controller.dto.CommodityIntroDTO;
-import com.example.petshopuser.entity.Commodity;
-import com.example.petshopuser.entity.ReturnObj;
-import com.example.petshopuser.service.impl.CommodityServiceImpl;
+import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RequestMapping;
