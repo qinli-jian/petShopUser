@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.petshopuser.mapper.CommodityMapper">
+
+
+
+    <resultMap id="commodityIntroDTO" type="com.example.petshopuser.controller.dto.CommodityIntroDTO">
+        <result column="name" property="name" />
+        <result column="id" property="id"/>
+        <result column="imgs" property="imgs"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="createtime" property="createtime"/>
+    </resultMap>
+
+    <select id="getAllCommodityIntro" resultMap="commodityIntroDTO">
+        select * from commodity;
+    </select>
+    <select id="getCommodityIntroByKW" resultMap="commodityIntroDTO">
+        SELECT *
+        FROM commodity
+        WHERE name LIKE CONCAT('%', #{kw}, '%')
+    </select>
+    <select id="getCommodityMinPrice" resultType="java.math.BigDecimal">
+        SELECT MIN(price) AS min_price FROM specification_price WHERE commodity_id = #{id}
+    </select>
+
+
+    <resultMap id="commodityCategoryDTO" type="com.example.petshopuser.controller.dto.CommodityCategoryDTO">
+        <result column="category_name" property="category_name" />
+        <result column="id" property="id"/>
+        <result column="createTime" property="createTime"/>
+        <result column="level" property="level"/>
+        <result column="p_level_id" property="p_level_id"/>
+    </resultMap>
+    <select id="getCategoryById" resultMap="commodityCategoryDTO">
+        select * from commodity_categories where id=#{categoryId}
+    </select>
+</mapper>

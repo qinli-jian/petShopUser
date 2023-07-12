@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
@@ -104,7 +105,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     // 将当前时间戳转换为Timestamp对象
         Timestamp current = new Timestamp(currentTimestamp);
 
-    // 获取数据库中的时间戳
+        // 获取数据库中的时间戳
         Timestamp time = userMapper.get_phoneCodeTimeByPhone(phone);
 
         // 计算时间差（单位：毫秒）
@@ -135,5 +136,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return 0;
         }
         return b;
+    }
+
+    public User getUserInfoByPhone(String phone) {
+        User user = userMapper.getUserInfoByPhone(phone);
+        return user;
+    }
+
+    public User getUserInfoByUserId(String user_id) {
+        User user = userMapper.getUserInfoByUserId(user_id);
+        return user;
+    }
+
+    public int modifyProfile(Map<String, String> user_info) {
+        User user = null;
+        if(user_info.get("id").isEmpty() || user_info.get("avatar").isEmpty() || user_info.get("name").isEmpty() || user_info.get("sex").isEmpty() || user_info.get("age").isEmpty() || user_info.get("account").isEmpty() || user_info.get("phone").isEmpty() || user_info.get("password").isEmpty() || user_info.get("address").isEmpty()){
+            return -1;
+        }
+        try{
+            user = new User(user_info.get("id"),user_info.get("avatar"),user_info.get("name"),user_info.get("sex"),user_info.get("age"),user_info.get("account"),user_info.get("phone"),user_info.get("password"),user_info.get("address"));
+        }catch (Exception e){
+            System.out.println("提取数据失败");
+            return 0;
+        }
+        int flag = userMapper.update_userProfile(user);
+        if(flag==1){
+            return 1;
+        }else{
+            return 0;
+        }
     }
 }

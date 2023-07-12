@@ -11,6 +11,9 @@
     <update id="update_phoneCode">
         update phone_Code set time=CURRENT_TIMESTAMP,code=#{code} where phone=#{phone}
     </update>
+    <update id="update_userProfile">
+        update user set name=#{name},sex=#{sex},age=#{age},address=#{address},avatar=#{avatar} where account=#{phone} and id=#{id}
+    </update>
 
     <select id="getAllUser" resultType="com.example.petshopuser.entity.User">
         select * from user;
@@ -29,5 +32,11 @@
     </select>
     <select id="findUserByAccount" resultType="com.example.petshopuser.entity.User">
         select * from user where account = #{account};
+    </select>
+    <select id="getUserInfoByPhone" resultType="com.example.petshopuser.entity.User">
+        select * from user where account=#{phone}
+    </select>
+    <select id="getUserInfoByUserId" resultType="com.example.petshopuser.entity.User">
+        select * from user where account=#{phone}
     </select>
 </mapper>
