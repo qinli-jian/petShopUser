@@ -4,10 +4,11 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
-@TableName(value = "order")
+@TableName(value = "order_info")
 public class Order {
     @TableField(value = "order_id")
     private String order_id;
@@ -20,7 +21,7 @@ public class Order {
     @TableField(value = "num")
     private Integer num;
     @TableField(value = "total_price")
-    private String total_price;
+    private BigDecimal total_price;
     @TableField(value = "create_time")
     private Date create_time;
 }

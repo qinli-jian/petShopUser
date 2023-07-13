@@ -1,11 +1,8 @@
 package com.example.petshopuser.controller;
 
 import com.example.petshopuser.common.Constants;
+import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
-import com.example.petshopuser.entity.Commodity;
-import com.example.petshopuser.entity.ReturnObj;
-import com.example.petshopuser.entity.Specification;
-import com.example.petshopuser.entity.Specification_price;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,8 +29,26 @@ public class CommodityController {
         ReturnObj returnObj = new ReturnObj();
         Map<String, Object> data = new HashMap<>();
         Commodity commodity = commodityService.getCommodityById(request_form.get("id"));
-        if (commodity != null)
+        if (commodity != null){
             data.put("commodity", commodity);
+            System.out.println(commodity.getCategory_id());
+            Category category = commodityService.getCategoryById2(commodity.getCategory_id());
+            if(category!=null){
+                Category category1 = commodityService.getCategoryById2(category.getP_level_id());
+                if(category1!=null){
+                    data.put("categoryLevel"+category.getLevel(), category.getCategory_name());
+                    data.put("categoryLevel"+category1.getLevel(), category1.getCategory_name());
+                }else {
+                    returnObj.setCode("500");
+                    returnObj.setMsg("该分类不存在");
+                    return returnObj;
+                }
+            }else{
+                returnObj.setCode("500");
+                returnObj.setMsg("该分类不存在");
+                return returnObj;
+            }
+        }
         else {
             returnObj.setCode("500");
             returnObj.setMsg("error");
@@ -104,6 +119,23 @@ public class CommodityController {
             returnObj.setCode(Constants.CODE_500);
             returnObj.setMsg("failed");
             System.out.println("========getAllCategory");
+            System.out.println(e);
+        }
+        return returnObj;
+    }
+
+    @GetMapping("/getAllSpecification")
+    public ReturnObj getAllSpecification(){
+        ReturnObj returnObj =new ReturnObj();
+        try {
+            List<Specification> specifications = commodityService.getAllSpecification();
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+            returnObj.setData(specifications);
+        }catch (Exception e){
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+            System.out.println("========getAllSpecification");
             System.out.println(e);
         }
         return returnObj;

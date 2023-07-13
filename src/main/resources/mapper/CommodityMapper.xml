@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.petshopuser.mapper.CommodityMapper">
-    <select id="getCommodityById" resultType="com.example.petshopuser.entity.Commodity">
+    <resultMap id="getCommodityByIdDTO" type="com.example.petshopuser.entity.Commodity">
+        <result column="id" property="id"/>
+        <result column="category_id"   property="category_id"/>
+        <result column="createTime"    property="createTime"/>
+        <result column="description" property="description"/>
+        <result column="name" property="name"/>
+        <result column="imgs" property="imgs"/>
+        <result column="specifications" property="specifications"/>
+    </resultMap>
+    <select id="getCommodityById" resultMap="getCommodityByIdDTO">
         select * from commodity where id = #{id};
     </select>
     <resultMap id="getAllByCommodityIdDTO" type="com.example.petshopuser.entity.Specification_price">
@@ -26,7 +35,19 @@
     <select id="getBySpecificationId" resultMap="getBySpecificationIdDTO">
         select * from specifications where id = #{id};
     </select>
-
+    <resultMap id="getAllSpecificationDTO" type="com.example.petshopuser.entity.Specification">
+        <result column="id" property="id" />
+        <result column="specification_name" property="specification_name"/>
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="type" property="type"/>
+        <result column="inventory" property="inventory"/>
+        <result column="sales_volume" property="sales_volume"/>
+        <result column="create_time" property="create_time"/>
+        <result column="images" property="images"/>
+    </resultMap>
+    <select id="getAllSpecification" resultMap="getAllSpecificationDTO">
+        select * from specifications
+    </select>
 
     <resultMap id="commodityIntroDTO" type="com.example.petshopuser.entity.DTO.CommodityIntroDTO">
         <result column="name" property="name" />
@@ -82,5 +103,14 @@
     </select>
     <select id="getCommodityIntrosByCategoryId_Kw" resultMap="commodityIntroDTO">
 
+    </select>
+    <resultMap id="getCategoryDTO" type="com.example.petshopuser.entity.Category">
+        <result column="category_name" property="category_name" />
+        <result column="id" property="id"/>
+        <result column="level" property="level"/>
+        <result column="p_level_id" property="p_level_id"/>
+    </resultMap>
+    <select id="getCategoryById2" resultMap="getCategoryDTO">
+        select * from commodity_categories where id = #{id}
     </select>
 </mapper>

@@ -1,12 +1,9 @@
 package com.example.petshopuser.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.petshopuser.entity.Commodity;
+import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
 import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
-import com.example.petshopuser.entity.Specification;
-import com.example.petshopuser.entity.Specification_price;
-import com.example.petshopuser.entity.User;
 import com.example.petshopuser.mapper.CommodityMapper;
 import com.example.petshopuser.mapper.UserMapper;
 import com.example.petshopuser.service.IUserService;
@@ -100,4 +97,8 @@ public class CommodityServiceImpl {
         List<CommodityIntroDTO> commodityIntroDTOList = commodityMapper.getCommodityIntrosByCategoryId_Kw(kw,child_category_ids,offset,pageSize);
         return commodityIntroDTOList;
     }
+
+    public Category getCategoryById2(String id){return commodityMapper.getCategoryById2(id);}
+
+    public List<Specification> getAllSpecification(){return commodityMapper.getAllSpecification();}
 }

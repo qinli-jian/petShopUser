@@ -6,6 +6,7 @@ import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.teaopenapi.models.Config;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.petshopuser.entity.Address;
+import com.example.petshopuser.entity.Ip_address;
 import com.example.petshopuser.entity.User;
 import com.example.petshopuser.mapper.UserMapper;
 import com.example.petshopuser.service.IUserService;
@@ -196,5 +197,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         return 0;
 
+    }
+    public Boolean setIP(String id,String user_id,String ip,String ip_address){
+        return userMapper.setIP(id, user_id, ip, ip_address);
+    }
+    public Ip_address getIP(String user_id){
+        return userMapper.getIP(user_id);
     }
 }

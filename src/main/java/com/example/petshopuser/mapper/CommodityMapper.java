@@ -1,6 +1,7 @@
 package com.example.petshopuser.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.petshopuser.entity.Category;
 import com.example.petshopuser.entity.Commodity;
 import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
@@ -40,4 +41,8 @@ public interface CommodityMapper extends BaseMapper<Commodity> {
     List<CommodityIntroDTO> getCommodityIntroByCategoryIdList(@Param("child_category_ids") ArrayList<String> child_category_ids,int offset,int pageSize);
 
     List<CommodityIntroDTO> getCommodityIntrosByCategoryId_Kw(String kw, String child_category_ids, int offset, int pageSize);
+
+    Category getCategoryById2(String id);
+
+    List<Specification> getAllSpecification();
 }
