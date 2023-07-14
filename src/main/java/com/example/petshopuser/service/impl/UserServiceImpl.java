@@ -244,12 +244,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String filename = null;
         try {
             String savePath = "E:\\作业文件\\实训\\code\\petShopUser\\src\\main\\resources\\static"; // 设置保存路径
-            String imageName = image.getName();
+            String imageName = image.getOriginalFilename();
+            System.out.println(imageName);
             int end_name_idx = imageName.lastIndexOf(".");
             String extension = imageName.substring(end_name_idx);
             filename = String.valueOf(snowflakeIdWorker.nextId())+extension;
             File destFile = new File(savePath , filename);
             image.transferTo(destFile);
+            int f = userMapper.save_avatar(userId,filename);
+            if(f!=1){
+                return null;
+            }
         } catch (Exception e) {
             // 处理文件保存失败的逻辑
             e.printStackTrace();
