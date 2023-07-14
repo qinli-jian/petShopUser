@@ -39,4 +39,10 @@ public interface UserMapper extends BaseMapper<User> {
     int update_resetUserPassword(String account, String password);
 
     int insert_userAddress(String user_id, Address new_address);
+
+    int updateAddress(String user_id, Address new_address);
+
+    List<Address> getAddressListByUserId(String user_id);
+
+    int delete_address(String user_id, String address_id);
 }

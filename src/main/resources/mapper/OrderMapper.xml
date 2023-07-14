@@ -11,6 +11,6 @@
         <result column="create_time" property="create_time"/>
     </resultMap>
     <select id="getOrderById" resultMap="getOrderByIdDTO">
-        SELECT * FROM `order` where order_id = #{order_id}
+        SELECT * FROM order_info where order_id = #{order_id}
     </select>
 </mapper>

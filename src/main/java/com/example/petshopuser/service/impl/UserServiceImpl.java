@@ -12,11 +12,14 @@ import com.example.petshopuser.service.IUserService;
 import com.example.petshopuser.utils.SnowflakeIdWorker;
 import com.example.petshopuser.utils.Utils;
 import com.google.gson.Gson;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -88,8 +91,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             Client client = new Client(config);
             SendSmsRequest smsrequest = new SendSmsRequest();
             smsrequest.phoneNumbers = phone; // 该参数值为假设值，请您根据实际情况进行填写
-            smsrequest.signName = "aicqmodel"; // 该参数值为假设值，请您根据实际情况进行填写
-            smsrequest.templateCode = "SMS_272955176";
+            smsrequest.signName = "顶针的动物朋友"; // 该参数值为假设值，请您根据实际情况进行填写
+            smsrequest.templateCode = "SMS_282495027";
             smsrequest.templateParam = "{code:"+code+"}";
             SendSmsResponse response = client.sendSms(smsrequest);
             System.out.println(new Gson().toJson(response.body));
@@ -190,11 +193,67 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         address_obj = gson.fromJson(address, address_obj.getClass());
         String id = String.valueOf(snowflakeIdWorker.nextId());
         address_obj.put("id",id);
+//        System.out.println("---");
+//        System.out.println(address_obj.get("defaultAddress"));
+
+        // 进行判断关键的东西不能为空
+        if(address_obj.get("id").isEmpty() || address_obj.get("addressee").isEmpty() || address_obj.get("province").isEmpty()
+                || address_obj.get("city").isEmpty() || address_obj.get("county").isEmpty()
+                || address_obj.get("postcode").isEmpty() || address_obj.get("phone").isEmpty()){
+            return -1;
+        }
+
         Address new_address = new Address(address_obj);
         // 根据user_id进行插入new_address
         int flag = userMapper.insert_userAddress(user_id,new_address);
 
-        return 0;
+        return flag;
 
+    }
+
+    public int updateAddress(String user_id, String address) {
+        Gson gson = new Gson();
+        HashMap<String, String> address_obj = new HashMap<>();
+        address_obj = gson.fromJson(address, address_obj.getClass());
+        Address new_address = new Address(address_obj);
+        System.out.println("新地址");
+        System.out.println(new_address);
+        int flag = userMapper.updateAddress(user_id,new_address);
+
+        return flag;
+
+    }
+
+    public List<Address> getAddressListByUserId(String user_id) {
+
+        List<Address> addressList = userMapper.getAddressListByUserId(user_id);
+
+        return addressList;
+
+    }
+
+    public int delete_address(String user_id, String address_id) {
+
+        int flag = userMapper.delete_address(user_id,address_id);
+        return flag;
+    }
+
+    public String save_avatar(String userId, MultipartFile image) {
+        // 保存文件到本地
+        String filename = null;
+        try {
+            String savePath = "E:\\作业文件\\实训\\code\\petShopUser\\src\\main\\resources\\static"; // 设置保存路径
+            String imageName = image.getName();
+            int end_name_idx = imageName.lastIndexOf(".");
+            String extension = imageName.substring(end_name_idx);
+            filename = String.valueOf(snowflakeIdWorker.nextId())+extension;
+            File destFile = new File(savePath , filename);
+            image.transferTo(destFile);
+        } catch (Exception e) {
+            // 处理文件保存失败的逻辑
+            e.printStackTrace();
+            return null;
+        }
+        return filename;
     }
 }

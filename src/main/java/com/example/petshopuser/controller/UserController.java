@@ -1,12 +1,18 @@
 package com.example.petshopuser.controller;
 
 import com.example.petshopuser.common.Constants;
+import com.example.petshopuser.entity.Address;
 import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.entity.User;
 import com.example.petshopuser.utils.Utils;
+import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import com.example.petshopuser.service.impl.UserServiceImpl;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -267,6 +273,7 @@ public class UserController {
         return returnObj;
     }
 
+    //添加收获地址
     @PostMapping("/addaddress")
     public ReturnObj addaddress(@RequestBody Map<String,String> address_form){
         ReturnObj returnObj = new ReturnObj();
@@ -279,6 +286,120 @@ public class UserController {
         }
         // 根据user_id进行insertaddress
         int flag = userService.addAddress(user_id,address);
+        if(flag==1){
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }else{
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+        }
+        return returnObj;
+    }
+
+    // 更新地址
+    @PostMapping("/updateaddress")
+    public ReturnObj updateaddress(@RequestBody Map<String,String> address_form){
+        ReturnObj returnObj = new ReturnObj();
+        String user_id = address_form.get("user_id");
+        String address = address_form.get("address");
+        if(user_id==null || address==null){
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("参数错误");
+        }
+        int flag = userService.updateAddress(user_id,address);
+        if(flag==1){
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }else{
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+        }
+        return returnObj;
+    }
+
+    // 返回地址列表
+    @GetMapping("/addresslist")
+    public ReturnObj addresslist(@RequestParam(value = "user_id") String user_id){
+        ReturnObj returnObj = new ReturnObj();
+        try{
+            List<Address> addressList = userService.getAddressListByUserId(user_id);
+            returnObj.setData(addressList);
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }catch (Exception e){
+            System.out.printf("返回地址列表");
+            System.out.println(e);
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+        }
+        return returnObj;
+    }
+
+    // 上传地址id和用户id进行删除
+    @DeleteMapping("/deleteAddress")
+    public ReturnObj deleteAddress(@RequestParam(value = "user_id") String user_id,@RequestParam(value = "address_id") String address_id){
+        ReturnObj returnObj = new ReturnObj();
+        int flag = userService.delete_address(user_id,address_id);
+        if(flag==1){
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }else{
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+        }
+        return returnObj;
+    }
+
+    // 头像更新
+    @PostMapping("/uploadAvatar")
+    public ReturnObj uploadAvatar(MultipartFile image,@RequestParam("user_id") String userId){
+        ReturnObj returnObj = new ReturnObj();
+        // 创建一个RestTemplate对象
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 检查是否接收到文件
+        if (image.isEmpty()) {
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("No file received.");
+            return returnObj;
+        }
+        // 检查文件类型
+        String contentType = image.getContentType();
+        if (!contentType.startsWith("image/")) {
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("Invalid file type. Only image files are allowed.");
+            return returnObj;
+        }
+        String staticImagePath = "E:\\作业文件\\实训\\code\\petShopUser\\src\\main\\resources\\static";
+        //保存文件
+        String filename = userService.save_avatar(userId,image);
+
+        // 设置请求头，指定Content-Type为multipart/form-data
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        // 构建请求体，将接收到的图片作为表单项添加到请求体中
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("image", image.getResource());
+
+        // 创建HttpEntity对象，封装请求头和请求体
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        // 发送POST请求，将图片转发到Django接口
+        String djangoEndpoint = "http://124.70.51.6:8000/upload/";
+        ResponseEntity<String> responseEntity = restTemplate.exchange(djangoEndpoint, HttpMethod.POST, requestEntity, String.class);
+        System.out.println("响应");
+        System.out.println(responseEntity);
+        // 处理Django接口的响应结果
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            // 转发成功
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("Avatar uploaded and forwarded successfully.");
+        } else {
+            // 转发失败
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("Failed to forward avatar to Django interface.");
+        }
 
         return returnObj;
     }
