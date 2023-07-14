@@ -16,14 +16,14 @@ import java.util.List;
 
 @Mapper
 public interface CommodityMapper extends BaseMapper<Commodity> {
-    List<CommodityIntroDTO> getAllCommodityIntro(int offset,int pageSize);
+    List<CommodityIntroDTO> getAllCommodityIntro(int offset,int pageSize,String ranking);
     Commodity getCommodityById(String id);
 
     List<Specification_price> getAllByCommodityId(String commodity_id);
 
     Specification getBySpecificationId(String id);
 
-    List<CommodityIntroDTO> getCommodityIntroByKW(String kw,int offset,int pageSize);
+    List<CommodityIntroDTO> getCommodityIntroByKW(String kw,int offset,int pageSize,String ranking);
 
     BigDecimal getCommodityMinPrice(String id);
 
@@ -35,14 +35,13 @@ public interface CommodityMapper extends BaseMapper<Commodity> {
 
     List<CommodityCategoryDTO> getChildCategoryByPlevel(String p_level_id);
 
-    List<CommodityIntroDTO> getCommodityIntroByCategoryId(String category_id,int offset,int pageSize);
+    List<CommodityIntroDTO> getCommodityIntroByCategoryId(String category_id,int offset,int pageSize,String ranking);
 
 
-    List<CommodityIntroDTO> getCommodityIntroByCategoryIdList(@Param("child_category_ids") ArrayList<String> child_category_ids,int offset,int pageSize);
-
-    List<CommodityIntroDTO> getCommodityIntrosByCategoryId_Kw(String kw, String child_category_ids, int offset, int pageSize);
+    List<CommodityIntroDTO> getCommodityIntroByCategoryIdList(@Param("child_category_ids") ArrayList<String> child_category_ids,int offset,int pageSize,String ranking);
 
     Category getCategoryById2(String id);
 
     List<Specification> getAllSpecification();
+    List<CommodityIntroDTO> getCommodityIntrosByCategoryId_Kw(String kw, ArrayList<String> child_category_ids, int offset, int pageSize,String ranking);
 }

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 @Data
 @TableName("commodity")
@@ -36,11 +37,18 @@ public class Address {
         this.addressee = address_obj.get("addressee");
         this.province = address_obj.get("province");
         this.city = address_obj.get("city");
-        this.county = address_obj.get(county);
+        this.county = address_obj.get("county");
         this.detailed_address = address_obj.get("detailed_address");
         this.postcode = address_obj.get("postcode");
         this.phone = address_obj.get("phone");
-        this.defaultAddress = address_obj.get("defaultAddress");
+        String isdefulat;
+        if(Objects.equals(address_obj.get("defaultAddress"), "true")){
+            isdefulat = "1";
+        }else{
+            isdefulat = "0";
+        }
+
+        this.defaultAddress = isdefulat;
     }
 
     public Address(String id, String addressee, String province, String city, String county, String detailed_address, String postcode, String phone, String defaultAddress) {

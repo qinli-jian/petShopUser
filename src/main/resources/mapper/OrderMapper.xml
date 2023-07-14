@@ -37,5 +37,6 @@
     </resultMap>
     <select id="findStatusById" resultMap="findStatusByIdDTO">
         select * from status_description where status_description_id = #{id}
+
     </select>
 </mapper>
