@@ -34,15 +34,56 @@
         <result column="imgs" property="imgs"/>
         <result column="category_id" property="categoryId"/>
         <result column="createtime" property="createtime"/>
+        <result column="total_sales" property="total_sales"/>
     </resultMap>
 
     <select id="getAllCommodityIntro" resultMap="commodityIntroDTO">
-        select * from commodity limit #{offset},#{pageSize}
+        select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
+        from commodity c
+        INNER JOIN specification_price s ON c.id = s.commodity_id
+        GROUP BY c.id
+        <choose>
+            <when test="ranking == 'P_ASC'">
+                ORDER BY min_price ASC
+            </when>
+            <when test="ranking == 'P_DES'">
+                ORDER BY min_price DESC
+            </when>
+            <when test="ranking == 'S_ASC'">
+                ORDER BY total_sales ASC
+            </when>
+            <when test="ranking == 'S_DES'">
+                ORDER BY total_sales DESC
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
+        LIMIT #{offset},#{pageSize}
     </select>
     <select id="getCommodityIntroByKW" resultMap="commodityIntroDTO">
-        SELECT *
-        FROM commodity
-        WHERE name LIKE CONCAT('%', #{kw}, '%') limit #{offset},#{pageSize}
+        select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
+        from commodity c
+        INNER JOIN specification_price s ON c.id = s.commodity_id
+        GROUP BY c.id
+        <choose>
+            <when test="ranking == 'P_ASC'">
+                ORDER BY min_price ASC
+            </when>
+            <when test="ranking == 'P_DES'">
+                ORDER BY min_price DESC
+            </when>
+            <when test="ranking == 'S_ASC'">
+                ORDER BY total_sales ASC
+            </when>
+            <when test="ranking == 'S_DES'">
+                ORDER BY total_sales DESC
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
+        limit #{offset},#{pageSize}
     </select>
     <select id="getCommodityMinPrice" resultType="java.math.BigDecimal">
         SELECT MIN(price) AS min_price FROM specification_price WHERE commodity_id = #{id}
@@ -72,8 +113,27 @@
         select * from commodity order by create_time desc limit #{offset}, #{pageSize}
     </select>
     <select id="getCommodityIntroByCategoryIdList" resultMap="commodityIntroDTO">
-        SELECT *
-        FROM commodity_categories
+        select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
+        from commodity c
+        INNER JOIN specification_price s ON c.id = s.commodity_id
+        GROUP BY c.id
+        <choose>
+            <when test="ranking == 'P_ASC'">
+                ORDER BY min_price ASC
+            </when>
+            <when test="ranking == 'P_DES'">
+                ORDER BY min_price DESC
+            </when>
+            <when test="ranking == 'S_ASC'">
+                ORDER BY total_sales ASC
+            </when>
+            <when test="ranking == 'S_DES'">
+                ORDER BY total_sales DESC
+            </when>
+            <otherwise>
+
+            </otherwise>
+        </choose>
         WHERE category_id IN
         <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
             #{id}
@@ -81,6 +141,32 @@
         ORDER BY create_time DESC limit #{offset}, #{pageSize}
     </select>
     <select id="getCommodityIntrosByCategoryId_Kw" resultMap="commodityIntroDTO">
+        select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
+        from commodity c
+        INNER JOIN specification_price s ON c.id = s.commodity_id
+        GROUP BY c.id
+        <choose>
+            <when test="ranking == 'P_ASC'">
+                ORDER BY min_price ASC
+            </when>
+            <when test="ranking == 'P_DES'">
+                ORDER BY min_price DESC
+            </when>
+            <when test="ranking == 'S_ASC'">
+                ORDER BY total_sales ASC
+            </when>
+            <when test="ranking == 'S_DES'">
+                ORDER BY total_sales DESC
+            </when>
+            <otherwise>
 
+            </otherwise>
+        </choose>
+        WHERE name LIKE CONCAT('%', #{kw}, '%')
+        <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        order by create_time desc
+        limit #{offset},#{pageSize}
     </select>
 </mapper>
