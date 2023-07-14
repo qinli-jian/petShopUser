@@ -2,6 +2,7 @@ package com.example.petshopuser.service.impl;
 
 import com.example.petshopuser.entity.Order;
 import com.example.petshopuser.entity.Order_Status;
+import com.example.petshopuser.entity.Order_commodity_specification;
 import com.example.petshopuser.entity.Status_description;
 import com.example.petshopuser.mapper.OrderMapper;
 import org.springframework.stereotype.Service;
@@ -28,4 +29,15 @@ public class OrderServiceImpl {
     public boolean putOrderStatus(Order_Status order_status){return orderMapper.putOrderStatus(order_status);}
 
     public Status_description findStatusById(String id){return orderMapper.findStatusById(id);}
+    public boolean putOCSList(List<Order_commodity_specification> OCSList ){
+        for (Order_commodity_specification order_commodity_specification : OCSList) {
+            if (!orderMapper.putOCS(order_commodity_specification)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public List<Order_commodity_specification> findOCSByOrder_Id(String order_id){
+        return orderMapper.findOCSByOrderId(order_id);
+    }
 }

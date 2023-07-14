@@ -1,6 +1,7 @@
 package com.example.petshopuser.controller;
 
 import com.example.petshopuser.entity.*;
+import com.example.petshopuser.entity.DTO.CSDTO;
 import com.example.petshopuser.entity.DTO.OrderDTO;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,20 +38,32 @@ public class OrderController {
     @PostMapping("/details")
     public ReturnObj getOrderByCommodityIdAndUserId(@RequestBody Map<String,String> request_form){
         ReturnObj returnObj = new ReturnObj();
-        Order order = orderService.getOrderById(request_form.get("order_id"));
+        String order_id = request_form.get("order_id");
+        Order order = orderService.getOrderById(order_id);//获取订单数据
         System.out.println(order);
         if(order!=null){
-            System.out.println(order.getCommodity_id()+" "+order.getUser_id());
-            Commodity commodity = commodityService.getCommodityById(order.getCommodity_id());
-            System.out.println(commodity);
-            User user = userService.getUserById(order.getUser_id());
-            System.out.println(user);
-            returnObj.setMsg("success");
-            returnObj.setCode("200");
             OrderDTO orderDTO = new OrderDTO();
             orderDTO.setOrder(order);
-            orderDTO.setCommodity(commodity);
+            System.out.println(order.getCommodity_id()+" "+order.getUser_id());
+            List<Order_commodity_specification> OCSList = orderService.findOCSByOrder_Id(order_id);
+            List<CSDTO> CSDTOList = new ArrayList<>();
+            for(Order_commodity_specification OCS:OCSList){
+                CSDTO csDTO = new CSDTO();
+                Commodity commodity = commodityService.getCommodityById(OCS.getCommodity_id());
+                System.out.println(commodity);
+                csDTO.setCommodity(commodity);
+                csDTO.setSpecification(OCS.getSpecifications());
+                csDTO.setNum(OCS.getNum());
+                csDTO.setPrice(OCS.getPrice());
+                CSDTOList.add(csDTO);
+
+            }
+            orderDTO.setCSDTOList(CSDTOList);
+            User user = userService.getUserById(order.getUser_id());
+            System.out.println(user);
             orderDTO.setUser(user);
+            returnObj.setMsg("success");
+            returnObj.setCode("200");
             orderDTO.setOrder_statusList(orderService.getAllStatusById(order.getOrder_id()));
             returnObj.setData(orderDTO);
         }
@@ -60,21 +74,35 @@ public class OrderController {
         return returnObj;
     }
     @PostMapping("/create")
-    public ReturnObj createOrder(@RequestBody Map<String,String> request_form){
+    public ReturnObj createOrder(@RequestBody Map<String,List<String>> request_form){
         ReturnObj returnObj = new ReturnObj();
         String order_id = String.valueOf(snowflakeIdWorker.nextId());
-        String user_id = request_form.get("user_id");
-        String commodity_id = request_form.get("commodity_id");
-        String specification = request_form.get("specification");
-        Integer num =  Integer.parseInt(request_form.get("num"));
-        BigDecimal total_price =new BigDecimal(request_form.get("total_price"));
+        String user_id = request_form.get("user_id").get(0);
+        List<Order_commodity_specification> OCSList = new ArrayList<>();
+        BigDecimal total_price = BigDecimal.valueOf(0);
+        Integer commodity_num=0;
+        for(int i=0;i<request_form.get("commodity_id").size();i++){
+            BigDecimal price =new BigDecimal(request_form.get("total_price").get(i));
+            total_price=total_price.add(price);
+            String commodity_id = request_form.get("commodity_id").get(i);
+            String specification = request_form.get("specification").get(i);
+            Integer num =  Integer.parseInt(request_form.get("num").get(i));
+            Order_commodity_specification OCS =new Order_commodity_specification();
+            OCS.setOrder_id(order_id);
+            OCS.setCommodity_id(commodity_id);
+            OCS.setSpecifications(specification);
+            OCS.setNum(num);
+            OCS.setPrice(price);
+            String id = String.valueOf(snowflakeIdWorker.nextId());
+            OCS.setId(id);
+            OCSList.add(OCS);
+            commodity_num++;
+        }
         Order order = new Order();
         order.setOrder_id(order_id);
-        order.setCommodity_id((commodity_id));
         order.setUser_id(user_id);
-        order.setSpecification(specification);
-        order.setNum(num);
         order.setTotal_price(total_price);
+        order.setNum(commodity_num);
         Order_Status order_status = new Order_Status();
         order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
         order_status.setOrder_id(order_id);
@@ -82,11 +110,12 @@ public class OrderController {
         Order_Status order_status1 = new Order_Status(order_status);
         order_status1.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
         order_status1.setStatus_description(orderService.findStatusById("3").getStatus_description());
-        if(orderService.putOrder(order)&&orderService.putOrderStatus(order_status)&&
+        if(orderService.putOCSList(OCSList)&&orderService.putOrder(order)&&orderService.putOrderStatus(order_status)&&
                 orderService.putOrderStatus(order_status1)){
             Map<String,Object> returnData = new HashMap<>();
             returnData.put("order", orderService.getOrderById(order_id));
             returnData.put("order_status", orderService.getAllStatusById(order_id));
+            returnData.put("OCSList", OCSList);
             returnObj.setData(returnData);
             returnObj.setMsg("success");
             returnObj.setCode("200");
