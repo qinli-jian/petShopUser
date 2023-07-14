@@ -33,6 +33,9 @@
             defaultAddress = #{new_address.defaultAddress}
         WHERE user_id = #{user_id} and id=#{new_address.id}
     </update>
+    <update id="save_avatar">
+        update user set avatar = #{filename} where id = #{user_id}
+    </update>
     <delete id="delete_address">
         delete from address where id = #{address_id} and user_id=#{user_id}
     </delete>

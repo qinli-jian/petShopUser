@@ -5,7 +5,13 @@ import com.example.petshopuser.entity.Address;
 import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.entity.User;
 import com.example.petshopuser.utils.Utils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -15,6 +21,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +47,9 @@ public class UserController {
                 returnObj.setMsg("登陆成功");
                 returnObj.setCode("200");
                 String token = Utils.generateToken(user,"user");
-                Map<String, String> data = new HashMap<>();
+                Map<String, Object> data = new HashMap<>();
                 data.put("token",token);
+                data.put("user",user);
                 returnObj.setData(data);
             }
             else{
@@ -179,7 +190,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ReturnObj profile(@RequestParam(value = "user_id") String user_id,@RequestParam(value = "phone")String phone){
+    public ReturnObj profile(@RequestParam(value = "user_id",required = false) String user_id,@RequestParam(value = "phone",required = false)String phone){
         ReturnObj returnObj = new ReturnObj();
         User user = null;
         if(user_id.isEmpty() && !phone.isEmpty()){
@@ -370,38 +381,58 @@ public class UserController {
             returnObj.setMsg("Invalid file type. Only image files are allowed.");
             return returnObj;
         }
-        String staticImagePath = "E:\\作业文件\\实训\\code\\petShopUser\\src\\main\\resources\\static";
+        String uploadUrl = "http://124.70.51.6:8000/upload/";
+        String staticImagePath = "E:\\作业文件\\实训\\code\\petShopUser\\src\\main\\resources\\static\\";
         //保存文件
         String filename = userService.save_avatar(userId,image);
-
-        // 设置请求头，指定Content-Type为multipart/form-data
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        // 构建请求体，将接收到的图片作为表单项添加到请求体中
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("image", image.getResource());
-
-        // 创建HttpEntity对象，封装请求头和请求体
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        // 发送POST请求，将图片转发到Django接口
-        String djangoEndpoint = "http://124.70.51.6:8000/upload/";
-        ResponseEntity<String> responseEntity = restTemplate.exchange(djangoEndpoint, HttpMethod.POST, requestEntity, String.class);
-        System.out.println("响应");
-        System.out.println(responseEntity);
-        // 处理Django接口的响应结果
-        if (responseEntity.getStatusCode().is2xxSuccessful()) {
-            // 转发成功
-            returnObj.setCode(Constants.CODE_200);
-            returnObj.setMsg("Avatar uploaded and forwarded successfully.");
-        } else {
-            // 转发失败
+        if(filename==null){
             returnObj.setCode(Constants.CODE_500);
-            returnObj.setMsg("Failed to forward avatar to Django interface.");
+            returnObj.setMsg("failed");
+            return returnObj;
+        }
+//
+//        // 设置请求头，指定Content-Type为multipart/form-data
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        String imagePath = staticImagePath+filename;
+        String code = sendImageToDjango(imagePath, uploadUrl);
+
+        if(code.equals(Constants.CODE_200)){
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }else{
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
         }
 
         return returnObj;
     }
+
+    public String sendImageToDjango(String filePath, String uploadUrl){
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Configure the RestTemplate with a ResourceHttpMessageConverter
+        restTemplate.getMessageConverters().add(new ResourceHttpMessageConverter());
+
+        MultiValueMap<String, Object> requestBody = new LinkedMultiValueMap<>();
+        requestBody.add("file", new FileSystemResource(new File(filePath)));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(uploadUrl, requestEntity, String.class);
+        System.out.println(responseEntity.toString());
+        // Handle the response
+        int statusCode = responseEntity.getStatusCodeValue();
+        String responseBody = responseEntity.getBody();
+        System.out.println("Status Code: " + statusCode);
+        System.out.println("Response Body: " + responseBody);
+        return responseBody;
+    }
+
+
+
 
 }
