@@ -1,15 +1,19 @@
 package com.example.petshopuser.controller;
 
 import com.example.petshopuser.common.Constants;
+import com.example.petshopuser.entity.Ip_address;
 import com.example.petshopuser.entity.Address;
 import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.entity.User;
+import com.example.petshopuser.utils.IpUtil;
+import com.example.petshopuser.utils.SnowflakeIdWorker;
 import com.example.petshopuser.utils.Utils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.core.io.FileSystemResource;
+import org.apache.coyote.Request;
 import org.springframework.http.*;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,24 +37,53 @@ import java.util.Map;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
+    private final SnowflakeIdWorker snowflakeIdWorker;
     @Resource
     private UserServiceImpl userService;
     @Resource
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public UserController(SnowflakeIdWorker snowflakeIdWorker) {
+        this.snowflakeIdWorker = snowflakeIdWorker;
+    }
     @PostMapping("/login")
-    public ReturnObj login(@RequestBody Map<String,String> login_form){
+    public ReturnObj login(@RequestBody Map<String,String> login_form,HttpServletRequest request){
         ReturnObj returnObj = new ReturnObj();
+
         System.out.println(login_form);
         User user = userService.findUserByAccount(login_form.get("account"));
         if(user!=null){
             if(bCryptPasswordEncoder.matches(login_form.get("password"),user.getPassword())){
+                System.out.println(request);
+                Map<String,String> map = new HashMap<>();
+                String res =  IpUtil.getIpAddr(request);
+                StringBuilder result= new StringBuilder();
+                int num=0;
+                for(int i=0;i<res.length();i++){
+                    if(res.charAt(i)=='|'){
+                        num++;
+                        if(num==4)
+                            break;
+                        continue;
+                    }
+                    if(res.charAt(i)!='0')
+                        result.append(res.charAt(i));
+                }
+                if(!result.toString().equals("unknown")){
+                    userService.setIP(String.valueOf(snowflakeIdWorker.nextId()), user.getId(),
+                            request.getHeader("X-Real-IP"), result.toString());
+                    map.put("ip", request.getHeader("X-Real-IP"));
+                    map.put("res", result.toString());
+                    returnObj.setMsg("位于: "+map.get("res")+",ip为: "+map.get("ip")+"的用户登陆成功");
+                }
+                else
                 returnObj.setMsg("登陆成功");
                 returnObj.setCode("200");
                 String token = Utils.generateToken(user,"user");
                 Map<String, Object> data = new HashMap<>();
                 data.put("token",token);
                 data.put("user",user);
+                data.put("ip", map.get("ip"));
+                data.put("ip_address", map.get("res"));
                 returnObj.setData(data);
             }
             else{
@@ -406,6 +440,56 @@ public class UserController {
             returnObj.setMsg("failed");
         }
 
+        return returnObj;
+    }
+    @GetMapping("/getIP")
+    public  ReturnObj getIP(@RequestParam String user_id,HttpServletRequest request){
+        System.out.println(request);
+        ReturnObj returnObj =new ReturnObj();
+        Map<String,String> map = new HashMap<>();
+        String res =  IpUtil.getIpAddr(request);
+        StringBuilder result= new StringBuilder();
+        int num=0;
+        for(int i=0;i<res.length();i++){
+            if(res.charAt(i)=='|'){
+                num++;
+                if(num==4)
+                    break;
+                continue;
+            }
+            if(res.charAt(i)!='0')
+                result.append(res.charAt(i));
+        }
+        if(!result.toString().equals("unknown")){
+            userService.setIP(String.valueOf(snowflakeIdWorker.nextId()), user_id,
+                    request.getHeader("X-Real-IP"), result.toString());
+            map.put("ip", request.getHeader("X-Real-IP"));
+            map.put("res", result.toString());
+            returnObj.setData(map);
+            returnObj.setMsg("success");
+            returnObj.setCode("200");
+        }
+        else{
+            returnObj.setData(false);
+            returnObj.setMsg("error");
+            returnObj.setCode("500");
+        }
+        return  returnObj;
+    }
+    @PostMapping("/getIPAddressByUId")
+    public ReturnObj getIPAddressByUId(@RequestBody Map<String,String> request_form){
+        ReturnObj returnObj =new ReturnObj();
+        Ip_address ip_address= userService.getIP(request_form.get("user_id"));
+        if(ip_address!=null){
+            returnObj.setCode("200");
+            returnObj.setMsg("success");
+            returnObj.setData(ip_address);
+        }
+        else{
+            returnObj.setCode("500");
+            returnObj.setMsg("账号有误或不存在该位置信息");
+            returnObj.setData(false);
+        }
         return returnObj;
     }
 
