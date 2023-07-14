@@ -11,6 +11,31 @@
         <result column="create_time" property="create_time"/>
     </resultMap>
     <select id="getOrderById" resultMap="getOrderByIdDTO">
-        SELECT * FROM `order` where order_id = #{order_id}
+        SELECT * FROM order_info where order_id = #{order_id}
+    </select>
+    <resultMap id="getAllStatusByIdDTO" type="com.example.petshopuser.entity.Order_Status">
+        <result column="status_id" property="status_id" />
+        <result column="order_id" property="order_id"/>
+        <result column="status_description" property="status_description"/>
+        <result column="create_time" property="create_time"/>
+    </resultMap>
+    <select id="getAllStatusById" resultMap="getAllStatusByIdDTO">
+        select * from order_status where order_id = #{order_id} order by create_time
+    </select>
+
+    <insert id="putOrder">
+        insert into order_info(order_id,commodity_id,user_id,specification,num,total_price)
+        values(#{order_id},#{commodity_id},#{user_id},#{specification},#{num},#{total_price})
+    </insert>
+    <insert id="putOrderStatus">
+        insert into order_status(status_id,order_id,status_description)
+        values(#{status_id},#{order_id},#{status_description})
+    </insert>
+    <resultMap id="findStatusByIdDTO" type="com.example.petshopuser.entity.Status_description">
+        <result column="status_description_id" property="status_description_id"/>
+        <result column="status_description" property="status_description"/>
+    </resultMap>
+    <select id="findStatusById" resultMap="findStatusByIdDTO">
+        select * from status_description where status_description_id = #{id}
     </select>
 </mapper>

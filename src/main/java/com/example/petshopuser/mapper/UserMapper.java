@@ -1,6 +1,8 @@
 package com.example.petshopuser.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.petshopuser.entity.Address;
+import com.example.petshopuser.entity.Ip_address;
 import com.example.petshopuser.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -35,4 +37,11 @@ public interface UserMapper extends BaseMapper<User> {
 
     int update_userProfile(User user);
 
+    int update_resetUserPassword(String account, String password);
+
+    int insert_userAddress(String user_id, Address new_address);
+
+    Boolean setIP(String id,String user_id,String ip,String ip_address);
+
+    Ip_address getIP(String user_id);
 }

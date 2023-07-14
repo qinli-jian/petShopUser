@@ -5,6 +5,8 @@ import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.teaopenapi.models.Config;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.petshopuser.entity.Address;
+import com.example.petshopuser.entity.Ip_address;
 import com.example.petshopuser.entity.User;
 import com.example.petshopuser.mapper.UserMapper;
 import com.example.petshopuser.service.IUserService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -154,11 +157,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     public int modifyProfile(Map<String, String> user_info) {
         User user = null;
-        if(user_info.get("id").isEmpty() || user_info.get("avatar").isEmpty() || user_info.get("name").isEmpty() || user_info.get("sex").isEmpty() || user_info.get("age").isEmpty() || user_info.get("account").isEmpty() || user_info.get("phone").isEmpty() || user_info.get("password").isEmpty() || user_info.get("address").isEmpty()){
+        if(user_info.get("avatar").isEmpty()){
+            user_info.put("avatar","avatar_user.jpg");
+        }
+        if(user_info.get("id").isEmpty() || user_info.get("name").isEmpty() || user_info.get("sex").isEmpty() || user_info.get("age").isEmpty() || user_info.get("account").isEmpty() || user_info.get("phone").isEmpty() ){
             return -1;
         }
         try{
-            user = new User(user_info.get("id"),user_info.get("avatar"),user_info.get("name"),user_info.get("sex"),user_info.get("age"),user_info.get("account"),user_info.get("phone"),user_info.get("password"),user_info.get("address"));
+            user = new User(user_info.get("id"),user_info.get("avatar"),user_info.get("name"),user_info.get("sex"),user_info.get("age"),user_info.get("account"),user_info.get("phone"),user_info.get("address"));
         }catch (Exception e){
             System.out.println("提取数据失败");
             return 0;
@@ -169,5 +175,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }else{
             return 0;
         }
+    }
+
+    public int resetPassword(String account, String password) {
+        String encodePassword = bCryptPasswordEncoder.encode(password);
+        int f = userMapper.update_resetUserPassword(account,encodePassword);
+        return f;
+    }
+
+    public int addAddress(String user_id, String address) {
+
+        // 把address json字符串转为对象
+        Gson gson = new Gson();
+        HashMap<String, String> address_obj = new HashMap<>();
+        address_obj = gson.fromJson(address, address_obj.getClass());
+        String id = String.valueOf(snowflakeIdWorker.nextId());
+        address_obj.put("id",id);
+        Address new_address = new Address(address_obj);
+        // 根据user_id进行插入new_address
+        int flag = userMapper.insert_userAddress(user_id,new_address);
+
+        return 0;
+
+    }
+    public Boolean setIP(String id,String user_id,String ip,String ip_address){
+        return userMapper.setIP(id, user_id, ip, ip_address);
+    }
+    public Ip_address getIP(String user_id){
+        return userMapper.getIP(user_id);
     }
 }

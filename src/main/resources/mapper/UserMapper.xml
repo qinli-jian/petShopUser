@@ -8,11 +8,18 @@
         INSERT INTO user (id,avatar,name,sex,age,account,password,address,phone)
         VALUES (#{id},#{avatar},#{name},#{sex},#{age},#{account},#{password},#{address},#{phone});
     </insert>
+    <insert id="insert_userAddress">
+        INSERT INTO user (id,user_id,addressee,province,city,county,detailed_address,postcode,phone,defaultAddress)
+        VALUES (#{id},#{user_id},#{addressee},#{province},#{city},#{county},#{detailed_address},#{postcode},#{phone},#{defaultAddress});
+    </insert>
     <update id="update_phoneCode">
         update phone_Code set time=CURRENT_TIMESTAMP,code=#{code} where phone=#{phone}
     </update>
     <update id="update_userProfile">
         update user set name=#{name},sex=#{sex},age=#{age},address=#{address},avatar=#{avatar} where account=#{phone} and id=#{id}
+    </update>
+    <update id="update_resetUserPassword">
+        update user set password = #{password} where account=#{account}
     </update>
 
     <select id="getAllUser" resultType="com.example.petshopuser.entity.User">
@@ -35,10 +42,28 @@
     </select>
     <select id="getUserById" resultType="com.example.petshopuser.entity.User">
         select * from user where id = #{id}
+    </select>
     <select id="getUserInfoByPhone" resultType="com.example.petshopuser.entity.User">
         select * from user where account=#{phone}
     </select>
     <select id="getUserInfoByUserId" resultType="com.example.petshopuser.entity.User">
         select * from user where account=#{phone}
+    </select>
+    <insert id="setIP">
+        insert into ip_address(id,user_id,ip,ip_address) values(#{id},#{user_id},#{ip},#{ip_address})
+    </insert>
+
+    <resultMap id="getIPDTO" type="com.example.petshopuser.entity.Ip_address">
+        <result column="id" property="id"/>
+        <result column="user_id" property="user_id"/>
+        <result column="ip" property="ip"/>
+        <result column="ip_address" property="ip_address"/>
+        <result column="create_time" property="create_time"/>
+    </resultMap>
+    <select id="getIP" resultMap="getIPDTO">
+        SELECT *
+        FROM ip_address
+        WHERE create_time = (SELECT MAX(create_time) FROM ip_address)
+        AND  user_id = #{user_id}
     </select>
 </mapper>
