@@ -1,6 +1,7 @@
 package com.example.petshopuser.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.Commodity;
 import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
@@ -9,14 +10,13 @@ import org.springframework.stereotype.Service;
 import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
 import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
 import com.example.petshopuser.service.ICommodityService;
-
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity> implements ICommodityService {
+public class CommodityServiceImpl {
 
     @Resource
     private CommodityMapper commodityMapper;
@@ -31,6 +31,7 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
     public Specification getBySpecificationId(String id) {
         return commodityMapper.getBySpecificationId(id);
     }
+
     public List<CommodityIntroDTO> getAllCommodityIntro(int pageNum,int pageSize,String ranking) {
         int offset = pageSize*(pageNum-1);
         List<CommodityIntroDTO> commodityIntroDTOList = commodityMapper.getAllCommodityIntro(offset,pageSize,ranking);
@@ -112,4 +113,8 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
         List<CommodityIntroDTO> commodityIntroDTOList = commodityMapper.getCommodityIntrosByCategoryId_Kw(kw,child_category_ids,offset,pageSize,ranking);
         return commodityIntroDTOList;
     }
+
+    public Category getCategoryById2(String id){return commodityMapper.getCategoryById2(id);}
+
+    public List<Specification> getAllSpecification(){return commodityMapper.getAllSpecification();}
 }

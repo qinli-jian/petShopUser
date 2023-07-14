@@ -64,6 +64,23 @@
     <select id="getUserInfoByUserId" resultType="com.example.petshopuser.entity.User">
         select * from user where account=#{phone}
     </select>
+    <insert id="setIP">
+        insert into ip_address(id,user_id,ip,ip_address) values(#{id},#{user_id},#{ip},#{ip_address})
+    </insert>
+
+    <resultMap id="getIPDTO" type="com.example.petshopuser.entity.Ip_address">
+        <result column="id" property="id"/>
+        <result column="user_id" property="user_id"/>
+        <result column="ip" property="ip"/>
+        <result column="ip_address" property="ip_address"/>
+        <result column="create_time" property="create_time"/>
+    </resultMap>
+    <select id="getIP" resultMap="getIPDTO">
+        SELECT *
+        FROM ip_address
+        WHERE create_time = (SELECT MAX(create_time) FROM ip_address)
+        AND  user_id = #{user_id}
+    </select>
 
     <resultMap id="addressDTO" type="com.example.petshopuser.entity.Address">
         <result column="id" property="id"/>
