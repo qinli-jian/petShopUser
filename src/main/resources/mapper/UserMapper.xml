@@ -9,8 +9,8 @@
         VALUES (#{id},#{avatar},#{name},#{sex},#{age},#{account},#{password},#{address},#{phone});
     </insert>
     <insert id="insert_userAddress">
-        INSERT INTO user (id,user_id,addressee,province,city,county,detailed_address,postcode,phone,defaultAddress)
-        VALUES (#{id},#{user_id},#{addressee},#{province},#{city},#{county},#{detailed_address},#{postcode},#{phone},#{defaultAddress});
+        INSERT INTO address (id,user_id,addressee,province,city,county,detailed_address,postcode,phone,defaultAddress)
+        VALUES (#{new_address.id},#{user_id},#{new_address.addressee},#{new_address.province},#{new_address.city},#{new_address.county},#{new_address.detailed_address},#{new_address.postcode},#{new_address.phone},#{new_address.defaultAddress});
     </insert>
     <update id="update_phoneCode">
         update phone_Code set time=CURRENT_TIMESTAMP,code=#{code} where phone=#{phone}
@@ -21,6 +21,24 @@
     <update id="update_resetUserPassword">
         update user set password = #{password} where account=#{account}
     </update>
+    <update id="updateAddress">
+        UPDATE address
+        SET addressee = #{new_address.addressee},
+            province = #{new_address.province},
+            city = #{new_address.city},
+            county = #{new_address.county},
+            detailed_address = #{new_address.detailed_address},
+            postcode = #{new_address.postcode},
+            phone = #{new_address.phone},
+            defaultAddress = #{new_address.defaultAddress}
+        WHERE user_id = #{user_id} and id=#{new_address.id}
+    </update>
+    <update id="save_avatar">
+        update user set avatar = #{filename} where id = #{user_id}
+    </update>
+    <delete id="delete_address">
+        delete from address where id = #{address_id} and user_id=#{user_id}
+    </delete>
 
     <select id="getAllUser" resultType="com.example.petshopuser.entity.User">
         select * from user;
@@ -65,5 +83,20 @@
         FROM ip_address
         WHERE create_time = (SELECT MAX(create_time) FROM ip_address)
         AND  user_id = #{user_id}
+    </select>
+
+    <resultMap id="addressDTO" type="com.example.petshopuser.entity.Address">
+        <result column="id" property="id"/>
+        <result column="addressee" property="addressee"/>
+        <result property="city" column="city"/>
+        <result property="county" column="county"/>
+        <result property="defaultAddress" column="defaultAddress"/>
+        <result property="detailed_address" column="detailed_address"/>
+        <result property="phone" column="phone"/>
+        <result property="postcode" column="postcode"/>
+        <result property="province" column="province"/>
+    </resultMap>
+    <select id="getAddressListByUserId" resultMap="addressDTO">
+        select * from address where user_id = #{user_id}
     </select>
 </mapper>

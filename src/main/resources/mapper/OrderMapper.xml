@@ -37,6 +37,7 @@
     </resultMap>
     <select id="findStatusById" resultMap="findStatusByIdDTO">
         select * from status_description where status_description_id = #{id}
+
     </select>
     <insert id="putOCS">
         insert into order_commoditys_specifications(id,order_id,commodity_id,specifications,num,price)

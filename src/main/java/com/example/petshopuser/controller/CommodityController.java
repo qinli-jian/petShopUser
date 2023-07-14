@@ -3,7 +3,14 @@ package com.example.petshopuser.controller;
 import com.example.petshopuser.common.Constants;
 import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
+import com.example.petshopuser.entity.Commodity;
+import com.example.petshopuser.entity.ReturnObj;
+import com.example.petshopuser.entity.Specification;
+import com.example.petshopuser.entity.Specification_price;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
@@ -12,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -78,8 +87,11 @@ public class CommodityController {
         return returnObj;
     }
 
+    // 时间降序，价格升序或降序(P_ASC，P_DES),销量升序或降序(S_ASC，S_DES)
     @GetMapping("/search")
-    public ReturnObj search(@RequestParam(value = "kw", required = false) String kw,@RequestParam(value = "category_id", required = false)String category_id,@RequestParam(value = "pageNum")Integer pageNum,@RequestParam(value = "pageSize")Integer pageSize){
+    public ReturnObj search(@RequestParam(value = "kw", required = false) String kw,@RequestParam(value = "category_id", required = false)String category_id,
+                            @RequestParam(value = "pageNum")Integer pageNum,@RequestParam(value = "pageSize")Integer pageSize,
+                            @RequestParam(value = "ranking",required = false) String ranking){
         ReturnObj returnObj = new ReturnObj();
         if(pageNum<=0 || pageSize <=0){
             returnObj.setCode(Constants.CODE_400);
@@ -90,16 +102,16 @@ public class CommodityController {
         //
         if(kw==null && category_id==null || kw.isEmpty() && category_id.isEmpty()){
             // 搜索全部的，返回商品的简介对象
-            commodityList = commodityService.getAllCommodityIntro(pageNum,pageSize);
+            commodityList = commodityService.getAllCommodityIntro(pageNum,pageSize,ranking);
         } else if (kw!=null && category_id==null || !kw.isEmpty() && category_id.isEmpty()) {
             // 根据kw关键字模糊
-            commodityList = commodityService.getCommodityIntroByKW(kw,pageNum,pageSize);
+            commodityList = commodityService.getCommodityIntroByKW(kw,pageNum,pageSize,ranking);
         }else if (kw==null && category_id!=null || kw.isEmpty() && !category_id.isEmpty()) {
             // 根据类别的ID进行搜索，这个ID有可能是一级或者是二级的
-            commodityList = commodityService.getCommodityIntroByCategoryId(category_id,pageNum,pageSize);
+            commodityList = commodityService.getCommodityIntroByCategoryId(category_id,pageNum,pageSize,ranking);
         }else{
             // 根据关键词和类别的ID进行搜索
-            commodityList = commodityService.getCommodityIntroByCategoryId_Kw(kw,category_id,pageNum,pageSize);
+            commodityList = commodityService.getCommodityIntroByCategoryId_Kw(kw,category_id,pageNum,pageSize,ranking);
         }
         returnObj.setCode(Constants.CODE_200);
         returnObj.setMsg("success");
@@ -138,6 +150,15 @@ public class CommodityController {
             System.out.println("========getAllSpecification");
             System.out.println(e);
         }
+        return returnObj;
+    }
+
+
+    // 上传商品id进行查询商品的规格组合，以便进行选择{ [{},{}组合对象列表],price,imgs}
+    @GetMapping("/commodity_specification_price")
+    public ReturnObj commodity_specification_price(@RequestParam(value = "commodity_id") String commodity_id){
+        ReturnObj returnObj = new ReturnObj();
+
         return returnObj;
     }
 

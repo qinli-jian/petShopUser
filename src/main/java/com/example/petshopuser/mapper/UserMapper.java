@@ -44,4 +44,12 @@ public interface UserMapper extends BaseMapper<User> {
     Boolean setIP(String id,String user_id,String ip,String ip_address);
 
     Ip_address getIP(String user_id);
+  
+    int updateAddress(String user_id, Address new_address);
+
+    List<Address> getAddressListByUserId(String user_id);
+
+    int delete_address(String user_id, String address_id);
+
+    int save_avatar(String user_id, String filename);
 }

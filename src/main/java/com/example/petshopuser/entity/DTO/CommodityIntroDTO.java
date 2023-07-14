@@ -16,5 +16,6 @@ public class CommodityIntroDTO {
     private String categoryId;
     private List<String> category;// 需要查询所属的类别
     private String createtime;
+    private Integer total_sales;
 
 }
