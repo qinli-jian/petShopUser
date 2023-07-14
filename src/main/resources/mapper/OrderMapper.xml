@@ -38,4 +38,19 @@
     <select id="findStatusById" resultMap="findStatusByIdDTO">
         select * from status_description where status_description_id = #{id}
     </select>
+    <insert id="putOCS">
+        insert into order_commoditys_specifications(id,order_id,commodity_id,specifications,num,price)
+        values (#{id},#{order_id},#{commodity_id},#{specifications},#{num},#{price})
+    </insert>
+    <resultMap id="findOCSByIdDTO" type="com.example.petshopuser.entity.Order_commodity_specification">
+        <result column="id" property="id"/>
+        <result column="order_id" property="order_id"/>
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="specifications" property="specifications"/>
+        <result column="num" property="num"/>
+        <result column="price" property="price"/>
+    </resultMap>
+    <select id="findOCSByOrderId" resultMap="findOCSByIdDTO">
+        select * from order_commoditys_specifications where order_id = #{order_id}
+    </select>
 </mapper>
