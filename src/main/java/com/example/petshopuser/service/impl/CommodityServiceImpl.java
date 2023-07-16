@@ -3,6 +3,7 @@ package com.example.petshopuser.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.Commodity;
+import com.example.petshopuser.entity.DTO.Specification_priceDTO;
 import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
 import com.example.petshopuser.mapper.CommodityMapper;
@@ -14,6 +15,7 @@ import javax.annotation.Resource;
 import javax.crypto.interfaces.PBEKey;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -117,11 +119,34 @@ public class CommodityServiceImpl {
 
     public Category getCategoryById2(String id){return commodityMapper.getCategoryById2(id);}
 
-    public List<Specification> getAllSpecification(){return commodityMapper.getAllSpecification();}
 
     public Boolean setComments(Comment comment){return commodityMapper.setComments(comment);}
 
     public List<Comment> findCommentsByCommodity_Id(String commodity_id){return commodityMapper.findCommentsByCommodity_Id(commodity_id);}
 
     public Comment findCommentsById(String id){return commodityMapper.findCommentsById(id);}
+
+    public List<Specification> getAllSpecification(String comodity_id){return commodityMapper.getAllSpecification(comodity_id);}
+
+    public ArrayList<Specification_priceDTO> getSpecification_priceByCommodity_id(String commodity_id) {
+        // 通过商品id获取到商品的规格组合
+        List<Specification_price> specification_priceList = commodityMapper.getSpecification_priceByCommodity_id(commodity_id);
+        ArrayList<Specification_priceDTO> specification_priceDTOArrayList = new ArrayList<>();
+        for (Specification_price specification_price :
+                specification_priceList) {
+            List<String> specification_ids = Arrays.asList(specification_price.getSpecification_ids().split(","));
+            // 规格组合列表
+            ArrayList<Specification> specifications = new ArrayList<>();
+            for (String specification_id:
+                    specification_ids) {
+                Specification specification = commodityMapper.getBySpecificationId(specification_id);
+                specifications.add(specification);
+            }
+
+            Specification_priceDTO specification_priceDTO = new Specification_priceDTO(specification_price);
+            specification_priceDTO.setSpecifications(specifications);
+            specification_priceDTOArrayList.add(specification_priceDTO);
+        }
+        return specification_priceDTOArrayList;
+    }
 }

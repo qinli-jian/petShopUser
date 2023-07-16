@@ -99,4 +99,7 @@
     <select id="getAddressListByUserId" resultMap="addressDTO">
         select * from address where user_id = #{user_id}
     </select>
+    <select id="getLastTwoIP" resultType="com.example.petshopuser.entity.Ip_address">
+        select * from ip_address where user_id=#{user_id} limit #{offset},#{num}
+    </select>
 </mapper>

@@ -74,6 +74,8 @@ public class UserController {
                     map.put("ip", request.getHeader("X-Real-IP"));
                     map.put("res", result.toString());
                     returnObj.setMsg("位于: "+map.get("res")+",ip为: "+map.get("ip")+"的用户登陆成功");
+                    // 判断是不是异地登录
+                    userService.check_remoteLogin(user.getId());
                 }
                 else
                 returnObj.setMsg("登陆成功");

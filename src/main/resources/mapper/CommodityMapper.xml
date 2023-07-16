@@ -27,10 +27,7 @@
         <result column="specification_name" property="specification_name"/>
         <result column="commodity_id" property="commodity_id"/>
         <result column="type" property="type"/>
-        <result column="inventory" property="inventory"/>
-        <result column="sales_volume" property="sales_volume"/>
         <result column="create_time" property="create_time"/>
-        <result column="images" property="images"/>
     </resultMap>
     <select id="getBySpecificationId" resultMap="getBySpecificationIdDTO">
         select * from specifications where id = #{id};
@@ -40,13 +37,10 @@
         <result column="specification_name" property="specification_name"/>
         <result column="commodity_id" property="commodity_id"/>
         <result column="type" property="type"/>
-        <result column="inventory" property="inventory"/>
-        <result column="sales_volume" property="sales_volume"/>
         <result column="create_time" property="create_time"/>
-        <result column="images" property="images"/>
     </resultMap>
     <select id="getAllSpecification" resultMap="getAllSpecificationDTO">
-        select * from specifications
+        select * from specifications where comodity_id=#{comodity_id}
     </select>
 
     <resultMap id="commodityIntroDTO" type="com.example.petshopuser.entity.DTO.CommodityIntroDTO">
@@ -199,7 +193,6 @@
     <select id="getCategoryById2" resultMap="getCategoryDTO">
         select * from commodity_categories where id = #{id}
     </select>
-
     <insert id="setComments">
         insert into comments(id,replyComments_id,user_id,commodity_id,content,imgs,rating)
         values (#{id},#{replyComments_id},#{user_id},#{commodity_id},#{content},#{imgs},#{rating})
@@ -231,4 +224,24 @@
         select * from comments where id = #{id}
     </select>
 
+    <select id="getCommodityIntroById" resultMap="commodityIntroDTO">
+        select * from commodity where id = #{commodity_id}
+    </select>
+
+    <resultMap id="specification_price" type="com.example.petshopuser.entity.Specification_price">
+        <result column="id" property="id"/>
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="specification_ids" property="specification_ids"/>
+        <result column="price" property="price"/>
+        <result column="inventory" property="inventory"/>
+        <result column="sales_volume" property="sales_volume"/>
+        <result column="img" property="img"/>
+    </resultMap>
+    <select id="getSpecification_priceById"
+            resultMap="specification_price">
+        select * from specification_price where id = #{specification_id}
+    </select>
+    <select id="getSpecification_priceByCommodity_id" resultMap="specification_price">
+        select * from specification_price where commodity_id = #{commodity_id}
+    </select>
 </mapper>

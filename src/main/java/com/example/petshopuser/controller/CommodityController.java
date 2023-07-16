@@ -4,6 +4,7 @@ import com.example.petshopuser.common.Constants;
 import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
 import com.example.petshopuser.entity.Commodity;
+import com.example.petshopuser.entity.DTO.Specification_priceDTO;
 import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
@@ -143,10 +144,10 @@ public class CommodityController {
     }
 
     @GetMapping("/getAllSpecification")
-    public ReturnObj getAllSpecification(){
+    public ReturnObj getAllSpecification(@RequestParam(value = "comodity_id") String comodity_id){
         ReturnObj returnObj =new ReturnObj();
         try {
-            List<Specification> specifications = commodityService.getAllSpecification();
+            List<Specification> specifications = commodityService.getAllSpecification(comodity_id);
             returnObj.setCode(Constants.CODE_200);
             returnObj.setMsg("success");
             returnObj.setData(specifications);
@@ -164,7 +165,14 @@ public class CommodityController {
     @GetMapping("/commodity_specification_price")
     public ReturnObj commodity_specification_price(@RequestParam(value = "commodity_id") String commodity_id){
         ReturnObj returnObj = new ReturnObj();
-
+        try{
+            ArrayList<Specification_priceDTO> specification_priceDTO = commodityService.getSpecification_priceByCommodity_id(commodity_id);
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }catch (Exception e){
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+        }
         return returnObj;
     }
 
