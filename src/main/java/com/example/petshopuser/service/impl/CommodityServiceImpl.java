@@ -1,6 +1,5 @@
 package com.example.petshopuser.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.Commodity;
 import com.example.petshopuser.entity.DTO.Specification_priceDTO;
@@ -10,9 +9,8 @@ import com.example.petshopuser.mapper.CommodityMapper;
 import org.springframework.stereotype.Service;
 import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
 import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
-import com.example.petshopuser.service.ICommodityService;
+
 import javax.annotation.Resource;
-import javax.crypto.interfaces.PBEKey;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;

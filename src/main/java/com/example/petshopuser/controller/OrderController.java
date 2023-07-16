@@ -94,6 +94,25 @@ public class OrderController {
 //            total_price=total_price.add(price);
             String commodity_id = request_form.get("commodity_id").get(i);
             String specification = request_form.get("specification").get(i);
+
+            String[] specifications_C =specification.split("\\+");
+            List<Specification> specificationList = commodityService.getAllSpecification(commodity_id);
+            int sign =0;
+            for(String items : specifications_C){
+                for(Specification item : specificationList){
+                    if(item.getSpecification_name().equals(items)){
+                        sign=1;
+                        break;
+                    }
+                }
+                if(sign==0){
+                    returnObj.setCode("500");
+                    returnObj.setMsg(items+"规格不存在或无库存");
+                    returnObj.setData(false);
+                }
+                sign=0;
+            }
+
             Integer num =  Integer.parseInt(request_form.get("num").get(i));
             Order order = new Order();
             order.setOrder_id(order_id);
@@ -335,7 +354,7 @@ public class OrderController {
                     String[] specifications_C = order.getSpecification().split("\\+");
                     System.out.println(Arrays.toString(specifications_C));
                     List<Map<String,String>> specifications = new ArrayList<>();
-                    List<Specification> specificationList = commodityService.getAllSpecification();
+                    List<Specification> specificationList = commodityService.getAllSpecification(commodity.getId());
                     for(String item : specifications_C){
                         for(Specification specification : specificationList){
                             if(specification.getSpecification_name().equals(item)){
