@@ -52,4 +52,6 @@ public interface UserMapper extends BaseMapper<User> {
     int delete_address(String user_id, String address_id);
 
     int save_avatar(String user_id, String filename);
+
+    List<Ip_address> getLastTwoIP(String user_id);
 }

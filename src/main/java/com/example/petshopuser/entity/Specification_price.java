@@ -18,4 +18,11 @@ public class Specification_price {
     private String specification_ids;
     @TableField(value = "price")
     private BigDecimal price;
+    @TableField(value = "inventory")
+    private int inventory;
+    @TableField(value = "sales_volume")
+    private int sales_volume;
+    @TableField(value = "img")
+    private String img;
+
 }

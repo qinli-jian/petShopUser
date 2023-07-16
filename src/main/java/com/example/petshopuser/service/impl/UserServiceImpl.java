@@ -268,4 +268,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Ip_address getIP(String user_id){
         return userMapper.getIP(user_id);
     }
+
+    // 检查是否是异地登录，无返回值，异地登录的话产生一条新消息就行
+    public void check_remoteLogin(String user_id) {
+
+        List<Ip_address> ips = userMapper.getLastTwoIP(user_id);
+
+    }
 }
