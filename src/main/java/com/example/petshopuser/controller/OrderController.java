@@ -39,33 +39,44 @@ public class OrderController {
     public ReturnObj getOrderByCommodityIdAndUserId(@RequestBody Map<String,String> request_form){
         ReturnObj returnObj = new ReturnObj();
         String order_id = request_form.get("order_id");
-        Order order = orderService.getOrderById(order_id);//获取订单数据
-        System.out.println(order);
-        if(order!=null){
-            OrderDTO orderDTO = new OrderDTO();
-            orderDTO.setOrder(order);
-            System.out.println(order.getCommodity_id()+" "+order.getUser_id());
-            List<Order_commodity_specification> OCSList = orderService.findOCSByOrder_Id(order_id);
-            List<CSDTO> CSDTOList = new ArrayList<>();
-            for(Order_commodity_specification OCS:OCSList){
-                CSDTO csDTO = new CSDTO();
-                Commodity commodity = commodityService.getCommodityById(OCS.getCommodity_id());
-                System.out.println(commodity);
-                csDTO.setCommodity(commodity);
-                csDTO.setSpecification(OCS.getSpecifications());
-                csDTO.setNum(OCS.getNum());
-                csDTO.setPrice(OCS.getPrice());
-                CSDTOList.add(csDTO);
-
+        List<Order> orders = orderService.getOrderById(order_id);//获取订单数据
+        System.out.println(orders);
+        if(orders!=null){
+//            OrderDTO orderDTO = new OrderDTO();
+//            orderDTO.setOrder(order);
+//            System.out.println(order.getCommodity_id()+" "+order.getUser_id());
+//            List<Order_commodity_specification> OCSList = orderService.findOCSByOrder_Id(order_id);
+//            List<CSDTO> CSDTOList = new ArrayList<>();
+//            for(Order_commodity_specification OCS:OCSList){
+//                CSDTO csDTO = new CSDTO();
+//                Commodity commodity = commodityService.getCommodityById(OCS.getCommodity_id());
+//                System.out.println(commodity);
+//                csDTO.setCommodity(commodity);
+//                csDTO.setSpecification(OCS.getSpecifications());
+//                csDTO.setNum(OCS.getNum());
+//                csDTO.setPrice(OCS.getPrice());
+//                CSDTOList.add(csDTO);
+//
+//            }
+//            orderDTO.setCSDTOList(CSDTOList);
+//            User user = userService.getUserById(order.getUser_id());
+//            System.out.println(user);
+//            orderDTO.setUser(user);
+//            returnObj.setMsg("success");
+//            returnObj.setCode("200");
+//            returnObj.setData(orderDTO);
+            BigDecimal total_price =  new BigDecimal(0);
+            for(Order order : orders){
+                total_price=total_price.add(order.getTotal_price());
             }
-            orderDTO.setCSDTOList(CSDTOList);
-            User user = userService.getUserById(order.getUser_id());
-            System.out.println(user);
-            orderDTO.setUser(user);
+            Map<String,Object> data = new HashMap<>();
+            data.put("order_id", orders.get(0).getOrder_id());
+            data.put("orders", orders);
+            data.put("order_status", orderService.getAllStatusById(order_id));
+            data.put("total_price", total_price);
+            returnObj.setData(data);
             returnObj.setMsg("success");
             returnObj.setCode("200");
-            orderDTO.setOrder_statusList(orderService.getAllStatusById(order.getOrder_id()));
-            returnObj.setData(orderDTO);
         }
         else{
             returnObj.setCode("500");
@@ -78,31 +89,41 @@ public class OrderController {
         ReturnObj returnObj = new ReturnObj();
         String order_id = String.valueOf(snowflakeIdWorker.nextId());
         String user_id = request_form.get("user_id").get(0);
-        List<Order_commodity_specification> OCSList = new ArrayList<>();
-        BigDecimal total_price = BigDecimal.valueOf(0);
-        Integer commodity_num=0;
+//        List<Order_commodity_specification> OCSList = new ArrayList<>();
+//        BigDecimal total_price = BigDecimal.valueOf(0);
+//        Integer commodity_num=0;
         for(int i=0;i<request_form.get("commodity_id").size();i++){
             BigDecimal price =new BigDecimal(request_form.get("total_price").get(i));
-            total_price=total_price.add(price);
+//            total_price=total_price.add(price);
             String commodity_id = request_form.get("commodity_id").get(i);
             String specification = request_form.get("specification").get(i);
             Integer num =  Integer.parseInt(request_form.get("num").get(i));
-            Order_commodity_specification OCS =new Order_commodity_specification();
-            OCS.setOrder_id(order_id);
-            OCS.setCommodity_id(commodity_id);
-            OCS.setSpecifications(specification);
-            OCS.setNum(num);
-            OCS.setPrice(price);
-            String id = String.valueOf(snowflakeIdWorker.nextId());
-            OCS.setId(id);
-            OCSList.add(OCS);
-            commodity_num++;
+            Order order = new Order();
+            order.setOrder_id(order_id);
+            order.setUser_id(user_id);
+            order.setCommodity_id(commodity_id);
+            order.setSpecification(specification);
+            order.setNum(num);
+            order.setTotal_price(price);
+            if(!orderService.putOrder(order)){
+                returnObj.setCode("500");
+                returnObj.setMsg("error");
+                returnObj.setData(false);
+                return returnObj;
+            }
+//            Order_commodity_specification OCS =new Order_commodity_specification();
+//            OCS.setOrder_id(order_id);
+//            OCS.setCommodity_id(commodity_id);
+//            OCS.setSpecifications(specification);
+//            OCS.setNum(num);
+//            OCS.setPrice(price);
+//            String id = String.valueOf(snowflakeIdWorker.nextId());
+//            OCS.setId(id);
+//            OCSList.add(OCS);
+//            commodity_num++;
         }
-        Order order = new Order();
-        order.setOrder_id(order_id);
-        order.setUser_id(user_id);
-        order.setTotal_price(total_price);
-        order.setNum(commodity_num);
+//        order.setTotal_price(total_price);
+//        order.setNum(commodity_num);
         Order_Status order_status = new Order_Status();
         order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
         order_status.setOrder_id(order_id);
@@ -110,12 +131,11 @@ public class OrderController {
         Order_Status order_status1 = new Order_Status(order_status);
         order_status1.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
         order_status1.setStatus_description(orderService.findStatusById("3").getStatus_description());
-        if(orderService.putOCSList(OCSList)&&orderService.putOrder(order)&&orderService.putOrderStatus(order_status)&&
+        if(orderService.putOrderStatus(order_status)&&
                 orderService.putOrderStatus(order_status1)){
             Map<String,Object> returnData = new HashMap<>();
             returnData.put("order", orderService.getOrderById(order_id));
             returnData.put("order_status", orderService.getAllStatusById(order_id));
-            returnData.put("OCSList", OCSList);
             returnObj.setData(returnData);
             returnObj.setMsg("success");
             returnObj.setCode("200");

@@ -199,4 +199,35 @@
     <select id="getCategoryById2" resultMap="getCategoryDTO">
         select * from commodity_categories where id = #{id}
     </select>
+
+    <insert id="setComments">
+        insert into comments(id,replyComments_id,user_id,commodity_id,content,imgs,rating)
+        values (#{id},#{replyComments_id},#{user_id},#{commodity_id},#{content},#{imgs},#{rating})
+    </insert>
+
+    <resultMap id="findCommentsBycommodity_IdDTO" type="com.example.petshopuser.entity.Comment">
+        <result column="id" property="id" />
+        <result column="replyComments_id" property="replyComments_id"/>
+        <result column="user_id" property="user_id"/>
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="content" property="content"/>
+        <result column="imgs" property="imgs"/>
+        <result column="rating" property="rating"/>
+    </resultMap>
+    <select id="findCommentsByCommodity_Id" resultMap="findCommentsBycommodity_IdDTO">
+        select * from comments where commodity_id = #{commodity_id}
+    </select>
+
+    <resultMap id="findCommentsByIdDTO" type="com.example.petshopuser.entity.Comment">
+        <result column="id" property="id" />
+        <result column="replyComments_id" property="replyComments_id"/>
+        <result column="user_id" property="user_id"/>
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="content" property="content"/>
+        <result column="imgs" property="imgs"/>
+        <result column="rating" property="rating"/>
+    </resultMap>
+    <select id="findCommentsById" resultMap="findCommentsByIdDTO">
+        select * from comments where id = #{id}
+    </select>
 </mapper>

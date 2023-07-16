@@ -16,7 +16,7 @@ public class OrderServiceImpl {
     @Resource
     private OrderMapper orderMapper;
 
-    public Order getOrderById(String order_id){
+    public List<Order> getOrderById(String order_id){
         return orderMapper.getOrderById(order_id);
     }
 

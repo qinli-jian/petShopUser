@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface OrderMapper extends BaseMapper<Order> {
 
-    Order getOrderById(String order_id);
+    List<Order> getOrderById(String order_id);
     List<Order_Status> getAllStatusById(String order_id);
 
     boolean putOrder(Order order);
