@@ -8,9 +8,8 @@ import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
-import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import com.example.petshopuser.service.impl.UserServiceImpl;
+import com.example.petshopuser.utils.SnowflakeIdWorker;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -31,8 +28,17 @@ import java.util.Map;
 @RestController
 @RequestMapping("/commodity")
 public class CommodityController {
+    private final SnowflakeIdWorker snowflakeIdWorker;
     @Resource
     private CommodityServiceImpl commodityService;
+
+    @Resource
+    private UserServiceImpl userService;
+
+    public CommodityController(SnowflakeIdWorker snowflakeIdWorker) {
+        this.snowflakeIdWorker = snowflakeIdWorker;
+    }
+
     @PostMapping("/details")
     public ReturnObj getCommodityById(@RequestBody Map<String,String> request_form) {
         ReturnObj returnObj = new ReturnObj();
@@ -159,6 +165,63 @@ public class CommodityController {
     public ReturnObj commodity_specification_price(@RequestParam(value = "commodity_id") String commodity_id){
         ReturnObj returnObj = new ReturnObj();
 
+        return returnObj;
+    }
+
+    @PostMapping("/comment/set")
+    public ReturnObj setComments(@RequestBody Map<String,String> request_form){
+        ReturnObj returnObj = new ReturnObj();
+        Comment comment = new Comment();
+        String id = String.valueOf(snowflakeIdWorker.nextId());
+        comment.setId(id);
+        comment.setUser_id(request_form.get("user_id"));
+        comment.setCommodity_id(request_form.get("commodity_id"));
+        comment.setReplyComments_id(request_form.get("replyComments_id"));
+        comment.setContent(request_form.get("content"));
+        comment.setImgs(request_form.get("imgs"));
+        comment.setRating(Integer.valueOf(request_form.get("rating")));
+        if(commodityService.setComments(comment)){
+            returnObj.setCode("200");
+            returnObj.setMsg("success");
+            returnObj.setData(commodityService.findCommentsById(id));
+        }
+        else{
+            returnObj.setData(false);
+            returnObj.setCode("500");
+            returnObj.setMsg("error");
+        }
+        return returnObj;
+    }
+    @PostMapping("/comment/get")
+    public ReturnObj findCommentsByCommodity_Id(@RequestBody Map<String,String> request_form){
+        ReturnObj returnObj = new ReturnObj();
+        String commodity_id = request_form.get("commodity_id");
+        List<Comment> comments = commodityService.findCommentsByCommodity_Id(commodity_id);
+        if(comments!=null){
+            Map<String,Object> data = new HashMap<>();
+            List<Map<String,Object>> dataList = new ArrayList<>();
+            for(Comment comment:comments){
+                User user = userService.getUserById(comment.getUser_id());
+                data.put("user_name", user.getName());
+                data.put("user_avatar", user.getAvatar());
+                data.put("commodity_id", comment.getCommodity_id());
+                data.put("replyComments_id", comment.getReplyComments_id());
+                data.put("content",comment.getContent());
+                data.put("rating", comment.getRating());
+                String[] imgs = comment.getImgs().split(",");
+                data.put("imgs", imgs);
+                data.put("time", comment.getCreateTime());
+                dataList.add(data);
+            }
+            returnObj.setData(dataList);
+            returnObj.setMsg("success");
+            returnObj.setCode("200");
+        }
+        else {
+            returnObj.setCode("500");
+            returnObj.setMsg("error");
+            returnObj.setData(false);
+        }
         return returnObj;
     }
 
