@@ -5,13 +5,12 @@ import com.example.petshopuser.entity.DTO.ShopCarDTO;
 import com.example.petshopuser.entity.ReturnObj;
 import com.example.petshopuser.mapper.ShopCartMapper;
 import com.example.petshopuser.service.impl.ShopCartServiceImpl;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/shopcart")
@@ -33,6 +32,29 @@ public class ShopCartController {
             returnObj.setCode(Constants.CODE_500);
             returnObj.setMsg("failed");
         }
+        return returnObj;
+    }
+
+    // 加入商品到购物车
+    @PostMapping("/addtoshopcart")
+    public ReturnObj addToShopCart(@RequestBody Map<String,ArrayList<Map<String,String>>> addToShopCartInfo,@RequestParam(value = "user_id") String user_id){
+        ReturnObj returnObj = new ReturnObj();
+
+//        String user_id = addToShopCartInfo.get("user_id");
+//        String commodity_id = addToShopCartInfo.get("commodity_id");
+//        String specification_price_id = addToShopCartInfo.get("specification_price_id");
+        // commodity_id、specification_price_id和amount数据都在infoList里面，只需要循环去除就行
+        ArrayList<Map<String, String>> infoList = addToShopCartInfo.get("infoList");
+        int am = infoList.size();
+        int f = shopCartService.insert_shopCart(user_id,infoList);
+        if(am!=f){
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("insert failed");
+        }else{
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("insert success");
+        }
+
         return returnObj;
     }
 
