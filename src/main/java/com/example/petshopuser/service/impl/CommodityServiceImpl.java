@@ -12,6 +12,7 @@ import com.example.petshopuser.entity.DTO.CommodityCategoryDTO;
 import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
 import com.example.petshopuser.service.ICommodityService;
 import javax.annotation.Resource;
+import javax.crypto.interfaces.PBEKey;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,6 +118,13 @@ public class CommodityServiceImpl {
     }
 
     public Category getCategoryById2(String id){return commodityMapper.getCategoryById2(id);}
+
+
+    public Boolean setComments(Comment comment){return commodityMapper.setComments(comment);}
+
+    public List<Comment> findCommentsByCommodity_Id(String commodity_id){return commodityMapper.findCommentsByCommodity_Id(commodity_id);}
+
+    public Comment findCommentsById(String id){return commodityMapper.findCommentsById(id);}
 
     public List<Specification> getAllSpecification(String comodity_id){return commodityMapper.getAllSpecification(comodity_id);}
 
