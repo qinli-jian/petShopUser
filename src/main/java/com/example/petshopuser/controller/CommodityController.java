@@ -169,6 +169,7 @@ public class CommodityController {
             ArrayList<Specification_priceDTO> specification_priceDTO = commodityService.getSpecification_priceByCommodity_id(commodity_id);
             returnObj.setCode(Constants.CODE_200);
             returnObj.setMsg("success");
+            returnObj.setData(specification_priceDTO);
         }catch (Exception e){
             returnObj.setCode(Constants.CODE_500);
             returnObj.setMsg("failed");

@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.petshopuser.mapper.ShopCartMapper">
+    <insert id="batchInsertToShopCar">
+        INSERT INTO shopping_cart (id,commodity_id, specification_price_id, amount)
+        VALUES
+        <foreach collection="infoList" item="item" separator=",">
+            (#{id},#{item.commodity_id}, #{item.specification_price_id}, #{item.amount})
+        </foreach>
+    </insert>
 
     <select id="getList" resultType="com.example.petshopuser.entity.ShopCart">
         select * from shopping_cart where user_id = #{user_id}

@@ -435,6 +435,9 @@ public class UserController {
         String code = sendImageToDjango(imagePath, uploadUrl);
 
         if(code.equals(Constants.CODE_200)){
+            HashMap<String, String> avatar = new HashMap<>();
+            avatar.put("avatar",filename);
+            returnObj.setData(avatar);
             returnObj.setCode(Constants.CODE_200);
             returnObj.setMsg("success");
         }else{
