@@ -230,4 +230,5 @@
     <select id="findCommentsById" resultMap="findCommentsByIdDTO">
         select * from comments where id = #{id}
     </select>
+
 </mapper>

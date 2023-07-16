@@ -14,10 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/user_order")
@@ -323,10 +320,34 @@ public class OrderController {
             List<Map<String,Object>> dataList = new ArrayList<>();
             for(Order order : orderList){
                 List<Order_Status> order_statusList = orderService.getAllStatusById(order.getOrder_id());
+                Order_Status order_status = null;
+                if(!order_statusList.isEmpty())
+                     order_status = order_statusList.get(order_statusList.size()-1);
                 if(status.equals("*")||
-                        (!order_statusList.isEmpty()&&order_statusList.get(order_statusList.size()-1).getStatus_description().equals(status))){
-                    data.put("order_status", order_statusList);
-                    data.put("order", order);
+                        (order_status!=null&&order_status.getStatus_description().equals(status))){
+                    data.put("order_status", order_status);
+                    data.put("order_create_time", order.getCreate_time());
+                    data.put("order_id", order.getOrder_id());
+                    data.put("total_price", order.getTotal_price());
+                    data.put("num", order.getNum());
+                    Commodity commodity = commodityService.getCommodityById(order.getCommodity_id());
+                    data.put("commodity", commodity);
+                    String[] specifications_C = order.getSpecification().split("\\+");
+                    System.out.println(Arrays.toString(specifications_C));
+                    List<Map<String,String>> specifications = new ArrayList<>();
+                    List<Specification> specificationList = commodityService.getAllSpecification();
+                    for(String item : specifications_C){
+                        for(Specification specification : specificationList){
+                            if(specification.getSpecification_name().equals(item)){
+                                Map<String,String> temp = new HashMap<>();
+                                temp.put("type",specification.getType());
+                                temp.put("value", item);
+                                specifications.add(temp);
+                                break;
+                            }
+                        }
+                    }
+                    data.put("specifications",specifications);
                     dataList.add(data);
                 }
             }

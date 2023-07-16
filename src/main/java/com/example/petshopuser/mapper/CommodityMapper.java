@@ -20,6 +20,7 @@ public interface CommodityMapper extends BaseMapper<Commodity> {
 
     Specification getBySpecificationId(String id);
 
+
     List<CommodityIntroDTO> getCommodityIntroByKW(String kw,int offset,int pageSize,String ranking);
 
     BigDecimal getCommodityMinPrice(String id);
