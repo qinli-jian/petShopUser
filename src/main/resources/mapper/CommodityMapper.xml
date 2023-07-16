@@ -223,6 +223,7 @@
     <select id="findCommentsById" resultMap="findCommentsByIdDTO">
         select * from comments where id = #{id}
     </select>
+
     <select id="getCommodityIntroById" resultMap="commodityIntroDTO">
         select * from commodity where id = #{commodity_id}
     </select>
