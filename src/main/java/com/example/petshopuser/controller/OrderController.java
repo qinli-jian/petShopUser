@@ -312,4 +312,33 @@ public class OrderController {
         }
         return returnObj;
     }
+
+    @PostMapping("/get_order_by_user_id")
+    public ReturnObj getOrderByUserId(@RequestBody Map<String,String> request_form){
+        ReturnObj returnObj = new ReturnObj();
+        String status = request_form.get("status");
+        List<Order> orderList = orderService.getOrderByUserId(request_form.get("user_id"));
+        if(orderList!=null){
+            Map<String,Object> data = new HashMap<>();
+            List<Map<String,Object>> dataList = new ArrayList<>();
+            for(Order order : orderList){
+                List<Order_Status> order_statusList = orderService.getAllStatusById(order.getOrder_id());
+                if(status.equals("*")||
+                        (!order_statusList.isEmpty()&&order_statusList.get(order_statusList.size()-1).getStatus_description().equals(status))){
+                    data.put("order_status", order_statusList);
+                    data.put("order", order);
+                    dataList.add(data);
+                }
+            }
+            returnObj.setCode("200");
+            returnObj.setMsg("success");
+            returnObj.setData(dataList);
+        }
+        else{
+            returnObj.setCode("500");
+            returnObj.setMsg("error");
+            returnObj.setData(false);
+        }
+        return returnObj;
+    }
 }

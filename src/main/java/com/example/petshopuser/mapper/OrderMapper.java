@@ -24,4 +24,6 @@ public interface OrderMapper extends BaseMapper<Order> {
     boolean putOCS(Order_commodity_specification OCS);
 
     List<Order_commodity_specification> findOCSByOrderId(String order_id);
+
+    List<Order> getOrderByUserId(String user_id);
 }

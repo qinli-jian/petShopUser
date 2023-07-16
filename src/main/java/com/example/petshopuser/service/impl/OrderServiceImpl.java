@@ -40,4 +40,9 @@ public class OrderServiceImpl {
     public List<Order_commodity_specification> findOCSByOrder_Id(String order_id){
         return orderMapper.findOCSByOrderId(order_id);
     }
+
+
+    public List<Order> getOrderByUserId(String user_id){
+        return orderMapper.getOrderByUserId(user_id);
+    }
 }
