@@ -434,6 +434,7 @@ public class OrderController {
         returnObj.setCode("200");
         return returnObj;
     }
+    //删除订单
     @DeleteMapping("/delete")
     public ReturnObj deleteOrderById(@RequestParam String order_id){
         ReturnObj returnObj =new ReturnObj();
@@ -448,6 +449,102 @@ public class OrderController {
             returnObj.setMsg("删除失败");
         }
 
+        return returnObj;
+    }
+
+    //模糊查询订单
+    @PostMapping("/findOrdersByKey")
+    public ReturnObj findOrdersBykey(@RequestParam Map<String,String> request_form){
+        ReturnObj returnObj = new ReturnObj();
+        String status = request_form.get("status");
+        String user_id = request_form.get("user_id");
+        String key     = request_form.get("key");
+        List<String> order_id_list = orderService.getOrderIdsByUId(user_id);
+        List<Map<String,Object>> order_list = new ArrayList<>();
+        for(String order_id_item : order_id_list){
+            Map<String,Object> order = new HashMap<>();
+            List<Order_Status> order_statusList = orderService.getAllStatusById(order_id_item);
+            Order_Status order_status = null;
+
+
+            if(!order_statusList.isEmpty()){
+                Order_Status latest_status =  order_statusList.get(0);
+                for(Order_Status item : order_statusList){
+
+                    if(Integer.parseInt(orderService.findStatusId(item.getStatus_description()))
+                            >Integer.parseInt(orderService.findStatusId(latest_status.getStatus_description()))){
+                        latest_status = item;
+                    }
+                }
+                order_status = latest_status;
+            }
+            else{
+                returnObj.setCode("500");
+                returnObj.setMsg(order_id_item+"该订单状态有错");
+                returnObj.setData(false);
+                continue;
+            }
+
+
+            if(status.equals("*")||
+                    (order_status.getStatus_description().equals(status))){
+                order.put("order_id", order_id_item);
+                order.put("status", order_status);  //设置订单状态
+
+                List<Order> user_order_list = orderService.getOrderByUserId(request_form.get("user_id"));
+                order.put("create_time", user_order_list.get(0).getCreate_time());
+                List<Map<String,Object>> commodity_list = new ArrayList<>();
+                BigDecimal total_price =new BigDecimal(0);
+                for(Order user_order_item : user_order_list){
+                    Map<String,Object> commodity = new HashMap<>();
+                    if(user_order_item.getOrder_id().equals(order_id_item)){
+                        String commodity_id =user_order_item.getCommodity_id();
+                        Commodity commodityO = commodityService.getCommodityById(commodity_id);
+                        commodity.put("commodity_id", commodityO.getId());
+                        commodity.put("commodity_name", commodityO.getName());
+                        commodity.put("image", commodityO.getImgs().split(", ")[0]);
+                        String[] specifications_C = user_order_item.getSpecification().split("\\+"); // 分割规格名
+                        List<Map<String,String>> specifications = new ArrayList<>();
+                        List<Specification> specificationList = commodityService.getAllSpecification(commodity_id);
+                        for(String item : specifications_C){
+                            for(Specification specification : specificationList){
+                                if(specification.getSpecification_name().equals(item)){
+                                    Map<String,String> temp = new HashMap<>();
+                                    temp.put("type",specification.getType());
+                                    temp.put("value", item);
+                                    specifications.add(temp);
+                                    break;
+                                }
+                            }
+                        }
+                        commodity.put("specifications", user_order_item.getSpecification());
+                        commodity.put("specification", specifications);
+                        commodity.put("num", user_order_item.getNum());
+                        commodity.put("price", user_order_item.getTotal_price().divide(new BigDecimal(user_order_item.getNum()),
+                                RoundingMode.HALF_EVEN));
+                        total_price = total_price.add( user_order_item.getTotal_price());
+                        commodity_list.add(commodity);
+
+                    }
+                }
+                order.put("total_price",total_price);
+                order.put("commodity_list", commodity_list);
+
+            }
+            else{
+                returnObj.setCode("500");
+                returnObj.setMsg("订单号为: "+order_id_item+"的订单状态有错");
+                returnObj.setData(false);
+                continue;
+            }
+            order_list.add(order);
+        }
+        returnObj.setData(order_list);
+
+
+
+        returnObj.setMsg("success");
+        returnObj.setCode("200");
         return returnObj;
     }
 

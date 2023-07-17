@@ -95,8 +95,10 @@ public class CommodityController {
                 for (String temp_id : temp_ids) {
                     Map<String,Object> specificationDTO = new HashMap<>();
                     Specification specification_item = commodityService.getBySpecificationId(temp_id);
-                    specificationDTO.put("specification_type", specification_item.getType());
-                    specificationDTO.put("specification_name", specification_item.getSpecification_name());
+                    if(specification_item!=null){
+                        specificationDTO.put("specification_type", specification_item.getType());
+                        specificationDTO.put("specification_name", specification_item.getSpecification_name());
+                    }
                     specificationDTO.put("Object",dataDTO);
                     dataDTO = specificationDTO;
                 }
