@@ -18,6 +18,10 @@ public class Specification {
     private String commodity_id;
     @TableField(value = "type")
     private String type;
+    @TableField(value = "sales_volume")
+    private Integer sales_volume;
+    @TableField(value = "images")
+    private String images;
     @TableField(value = "create_time")
     private Date create_time;
 

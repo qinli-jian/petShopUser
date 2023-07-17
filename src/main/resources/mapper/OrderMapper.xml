@@ -9,6 +9,9 @@
         <result column="num" property="num"/>
         <result column="total_price" property="total_price"/>
         <result column="create_time" property="create_time"/>
+        <result column="order_address" property="order_address"/>
+        <result column="waybill" property="waybill"/>
+        <result column="logistics_company" property="logistics_company"/>
     </resultMap>
     <select id="getOrderById" resultMap="getOrderByIdDTO">
         SELECT * FROM order_info where order_id = #{order_id}
@@ -39,6 +42,11 @@
         select * from status_description where status_description_id = #{id}
 
     </select>
+
+    <select id="findStatusId" resultType="String">
+        select status_description_id from status_description where status_description = #{status_description}
+    </select>
+
     <insert id="putOCS">
         insert into order_commoditys_specifications(id,order_id,commodity_id,specifications,num,price)
         values (#{id},#{order_id},#{commodity_id},#{specifications},#{num},#{price})
@@ -63,8 +71,22 @@
         <result column="num" property="num"/>
         <result column="total_price" property="total_price"/>
         <result column="create_time" property="create_time"/>
+        <result column="order_address" property="order_address"/>
+        <result column="waybill" property="waybill"/>
+        <result column="logistics_company" property="logistics_company"/>
     </resultMap>
     <select id="getOrderByUserId" resultMap="getOrderByUserIdDTO">
         SELECT * FROM order_info where user_id = #{user_id}
     </select>
+
+    <select id="getOrderIdsByUId" resultType="String">
+        SELECT order_id FROM order_info  WHERE user_id = #{user_id} GROUP BY order_id
+    </select>
+    <delete id="deleteOrderById">
+        delete from order_info where order_id = #{order_id}
+    </delete>
+
+    <delete id="deleteOrderStatusByOrderId">
+        delete from order_status where order_id = #{order_id}
+    </delete>
 </mapper>

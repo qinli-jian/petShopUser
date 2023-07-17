@@ -45,4 +45,11 @@ public class OrderServiceImpl {
     public List<Order> getOrderByUserId(String user_id){
         return orderMapper.getOrderByUserId(user_id);
     }
+
+    public List<String> getOrderIdsByUId(String user_id){ return orderMapper.getOrderIdsByUId(user_id);}
+
+    public String findStatusId(String status_description){return orderMapper.findStatusId(status_description);}
+
+    public Boolean deleteOrderById(String order_id){return (orderMapper.deleteOrderById(order_id)&&
+            orderMapper.deleteOrderStatusByOrderId(order_id));}
 }
