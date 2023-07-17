@@ -45,13 +45,14 @@ public class UserController {
     public UserController(SnowflakeIdWorker snowflakeIdWorker) {
         this.snowflakeIdWorker = snowflakeIdWorker;
     }
+    //用户登录接口
     @PostMapping("/login")
     public ReturnObj login(@RequestBody Map<String,String> login_form,HttpServletRequest request){
         ReturnObj returnObj = new ReturnObj();
 
         System.out.println(login_form);
         User user = userService.findUserByAccount(login_form.get("account"));
-        if(user!=null){
+        if(user!=null){//根据请求头信息获取登录ip并解析地址
             if(bCryptPasswordEncoder.matches(login_form.get("password"),user.getPassword())){
                 System.out.println(request);
                 Map<String,String> map = new HashMap<>();
@@ -435,6 +436,9 @@ public class UserController {
         String code = sendImageToDjango(imagePath, uploadUrl);
 
         if(code.equals(Constants.CODE_200)){
+            HashMap<String, String> avatar = new HashMap<>();
+            avatar.put("avatar",filename);
+            returnObj.setData(avatar);
             returnObj.setCode(Constants.CODE_200);
             returnObj.setMsg("success");
         }else{
@@ -444,6 +448,7 @@ public class UserController {
 
         return returnObj;
     }
+    //获取登录ip
     @GetMapping("/getIP")
     public  ReturnObj getIP(@RequestParam String user_id,HttpServletRequest request){
         System.out.println(request);
@@ -478,6 +483,7 @@ public class UserController {
         }
         return  returnObj;
     }
+    //根据用户id查询地址
     @PostMapping("/getIPAddressByUId")
     public ReturnObj getIPAddressByUId(@RequestBody Map<String,String> request_form){
         ReturnObj returnObj =new ReturnObj();

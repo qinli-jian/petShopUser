@@ -53,5 +53,5 @@ public interface UserMapper extends BaseMapper<User> {
 
     int save_avatar(String user_id, String filename);
 
-    List<Ip_address> getLastTwoIP(String user_id);
+    List<Ip_address> getLastTwoIP(String user_id,int offset,int num);
 }

@@ -24,4 +24,10 @@ public class Order {
     private BigDecimal total_price;
     @TableField(value = "create_time")
     private Date create_time;
+    @TableField(value = "order_address")
+    private String order_address;
+    @TableField(value = "logistics_company")
+    private String logistics_company;
+    @TableField(value = "waybill")
+    private String waybill;
 }

@@ -1,6 +1,5 @@
 package com.example.petshopuser.service.impl;
 
-import com.example.petshopuser.entity.Commodity;
 import com.example.petshopuser.entity.DTO.CommodityIntroDTO;
 import com.example.petshopuser.entity.DTO.ShopCarDTO;
 import com.example.petshopuser.entity.DTO.Specification_priceDTO;
@@ -9,12 +8,14 @@ import com.example.petshopuser.entity.Specification;
 import com.example.petshopuser.entity.Specification_price;
 import com.example.petshopuser.mapper.CommodityMapper;
 import com.example.petshopuser.mapper.ShopCartMapper;
+import com.example.petshopuser.utils.SnowflakeIdWorker;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ShopCartServiceImpl {
@@ -22,8 +23,15 @@ public class ShopCartServiceImpl {
     @Resource
     private ShopCartMapper shopCartMapper;
 
+    private final SnowflakeIdWorker snowflakeIdWorker;
+
+
     @Resource
     private CommodityMapper commodityMapper;
+
+    public ShopCartServiceImpl(SnowflakeIdWorker snowflakeIdWorker) {
+        this.snowflakeIdWorker = snowflakeIdWorker;
+    }
 
     public List<ShopCarDTO> getList(String user_id) {
 
@@ -62,5 +70,12 @@ public class ShopCartServiceImpl {
             shopCarDTOList.add(shopCarDTO);
         }
         return shopCarDTOList;
+    }
+
+
+    public int insert_shopCart(String user_id,ArrayList<Map<String, String>> infoList) {
+        String id = String.valueOf(snowflakeIdWorker.nextId());
+        int f = shopCartMapper.batchInsertToShopCar(id,user_id,infoList);
+        return f;
     }
 }
