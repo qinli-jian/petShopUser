@@ -5,7 +5,9 @@ import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
 import com.example.petshopuser.service.impl.UserServiceImpl;
 import com.example.petshopuser.utils.SnowflakeIdWorker;
+
 import com.example.petshopuser.utils.Utils;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -52,6 +54,7 @@ public class OrderController {
                         >Integer.parseInt(orderService.findStatusId(latest_status.getStatus_description()))){
                     latest_status = item;
                 }
+
             }
             order.put("latest_status",latest_status);
         }

@@ -19,6 +19,8 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.security.Key;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +42,18 @@ public class Utils {
 
     static private byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(secretKey);
     static private Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+
+
+    static public String nowTime(){
+        LocalDateTime now = LocalDateTime.now();
+
+        // 定义日期时间格式化器
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+
+        // 将时间戳转换为字符串
+        String formattedDateTime = now.format(formatter);
+        return formattedDateTime;
+    }
 
     static public String generateToken(User user,String role) {
 
@@ -97,7 +111,9 @@ public class Utils {
         }
     }
 
-    public static String sendImageToDjango(String filePath, String uploadUrl){
+
+    static public String sendImageToDjango(String filePath, String uploadUrl){
+
         RestTemplate restTemplate = new RestTemplate();
 
         // Configure the RestTemplate with a ResourceHttpMessageConverter

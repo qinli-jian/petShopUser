@@ -46,6 +46,7 @@ public class CommodityController {
         Map<String, Object> data = new HashMap<>();
         Map<String,Object> commodityO = new HashMap<>();
         Commodity commodity = commodityService.getCommodityById(id); //根据商品id查询商品
+
         if (commodity != null){
             commodityO.put("id", commodity.getId());
             commodityO.put("name", commodity.getName());
@@ -124,15 +125,23 @@ public class CommodityController {
             returnObj.setMsg("params error");
             return returnObj;
         }
+        System.out.println(kw);
+        System.out.println(category_id);
+        System.out.println(pageNum);
+        System.out.println(pageSize);
+        System.out.println(ranking);
         List<CommodityIntroDTO> commodityList = null;
         //
-        if(kw==null && category_id==null || kw.isEmpty() && category_id.isEmpty()){
+        if((kw==null || kw.isEmpty()) && (category_id==null || category_id.isEmpty())){
+            System.out.println("======所有");
             // 搜索全部的，返回商品的简介对象
             commodityList = commodityService.getAllCommodityIntro(pageNum,pageSize,ranking);
-        } else if (kw!=null && category_id==null || !kw.isEmpty() && category_id.isEmpty()) {
+        } else if ((kw!=null || !kw.isEmpty()) && (category_id==null ||  category_id.isEmpty())) {
             // 根据kw关键字模糊
+            System.out.println("======关键字");
             commodityList = commodityService.getCommodityIntroByKW(kw,pageNum,pageSize,ranking);
-        }else if (kw==null && category_id!=null || kw.isEmpty() && !category_id.isEmpty()) {
+        }else if ((kw==null || kw.isEmpty()) && (category_id!=null || !category_id.isEmpty())) {
+            System.out.println("======分类");
             // 根据类别的ID进行搜索，这个ID有可能是一级或者是二级的
             commodityList = commodityService.getCommodityIntroByCategoryId(category_id,pageNum,pageSize,ranking);
         }else{
@@ -195,63 +204,62 @@ public class CommodityController {
         }
         return returnObj;
     }
-    //商品评论插入
-    @PostMapping("/comment/set")
-    public ReturnObj setComments(@RequestBody Map<String,String> request_form){
-        ReturnObj returnObj = new ReturnObj();
-        Comment comment = new Comment();
-        String id = String.valueOf(snowflakeIdWorker.nextId());
-        comment.setId(id);
-        comment.setUser_id(request_form.get("user_id"));                  //提取请求参数
-        comment.setCommodity_id(request_form.get("commodity_id"));
-        comment.setReplyComments_id(request_form.get("replyComments_id"));
-        comment.setContent(request_form.get("content"));
-        comment.setImgs(request_form.get("imgs"));
-        comment.setRating(Integer.valueOf(request_form.get("rating")));
-        if(commodityService.setComments(comment)){                       //插入评论信息
-            returnObj.setCode("200");
-            returnObj.setMsg("success");
-            returnObj.setData(commodityService.findCommentsById(id));    //返回评论信息
-        }
-        else{
-            returnObj.setData(false);
-            returnObj.setCode("500");
-            returnObj.setMsg("error");
-        }
-        return returnObj;
-    }
-    //根据商品id获取商品评论
-    @PostMapping("/comment/get")
-    public ReturnObj findCommentsByCommodity_Id(@RequestBody Map<String,String> request_form){
-        ReturnObj returnObj = new ReturnObj();
-        String commodity_id = request_form.get("commodity_id");
-        List<Comment> comments = commodityService.findCommentsByCommodity_Id(commodity_id);  //根据商品id获取该商品所有评论
-        if(comments!=null){
-            Map<String,Object> data = new HashMap<>();
-            List<Map<String,Object>> dataList = new ArrayList<>();
-            for(Comment comment:comments){
-                User user = userService.getUserById(comment.getUser_id());           //提取并整合所需信息
-                data.put("user_name", user.getName());
-                data.put("user_avatar", user.getAvatar());
-                data.put("commodity_id", comment.getCommodity_id());
-                data.put("replyComments_id", comment.getReplyComments_id());
-                data.put("content",comment.getContent());
-                data.put("rating", comment.getRating());
-                String[] imgs = comment.getImgs().split(",");
-                data.put("imgs", imgs);
-                data.put("time", comment.getCreateTime());
-                dataList.add(data);
-            }
-            returnObj.setData(dataList);
-            returnObj.setMsg("success");
-            returnObj.setCode("200");
-        }
-        else {
-            returnObj.setCode("500");
-            returnObj.setMsg("error");
-            returnObj.setData(false);
-        }
-        return returnObj;
-    }
+
+//    @PostMapping("/comment/set")
+//    public ReturnObj setComments(@RequestBody Map<String,String> request_form){
+//        ReturnObj returnObj = new ReturnObj();
+//        Comment comment = new Comment();
+//        String id = String.valueOf(snowflakeIdWorker.nextId());
+//        comment.setId(id);
+//        comment.setUser_id(request_form.get("user_id"));
+//        comment.setCommodity_id(request_form.get("commodity_id"));
+//        comment.setReplyComments_id(request_form.get("replyComments_id"));
+//        comment.setContent(request_form.get("content"));
+//        comment.setImgs(request_form.get("imgs"));
+//        comment.setRating(Integer.valueOf(request_form.get("rating")));
+//        if(commodityService.setComments(comment)){
+//            returnObj.setCode("200");
+//            returnObj.setMsg("success");
+//            returnObj.setData(commodityService.findCommentsById(id));
+//        }
+//        else{
+//            returnObj.setData(false);
+//            returnObj.setCode("500");
+//            returnObj.setMsg("error");
+//        }
+//        return returnObj;
+//    }
+//    @PostMapping("/comment/get")
+//    public ReturnObj findCommentsByCommodity_Id(@RequestBody Map<String,String> request_form){
+//        ReturnObj returnObj = new ReturnObj();
+//        String commodity_id = request_form.get("commodity_id");
+//        List<Comment> comments = commodityService.findCommentsByCommodity_Id(commodity_id);
+//        if(comments!=null){
+//            Map<String,Object> data = new HashMap<>();
+//            List<Map<String,Object>> dataList = new ArrayList<>();
+//            for(Comment comment:comments){
+//                User user = userService.getUserById(comment.getUser_id());
+//                data.put("user_name", user.getName());
+//                data.put("user_avatar", user.getAvatar());
+//                data.put("commodity_id", comment.getCommodity_id());
+//                data.put("replyComments_id", comment.getReplyComments_id());
+//                data.put("content",comment.getContent());
+//                data.put("rating", comment.getRating());
+//                String[] imgs = comment.getImgs().split(",");
+//                data.put("imgs", imgs);
+//                data.put("time", comment.getCreateTime());
+//                dataList.add(data);
+//            }
+//            returnObj.setData(dataList);
+//            returnObj.setMsg("success");
+//            returnObj.setCode("200");
+//        }
+//        else {
+//            returnObj.setCode("500");
+//            returnObj.setMsg("error");
+//            returnObj.setData(false);
+//        }
+//        return returnObj;
+//    }
 
 }

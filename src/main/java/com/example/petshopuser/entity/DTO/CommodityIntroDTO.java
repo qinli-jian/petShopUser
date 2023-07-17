@@ -14,7 +14,7 @@ public class CommodityIntroDTO {
     private BigDecimal price;// 需要查询规格中最小的价格
     private String imgs;
     private String categoryId;
-    private List<String> category;// 需要查询所属的类别
+    private List<CommodityCategoryDTO> category;// 需要查询所属的类别
     private String createtime;
     private Integer total_sales;
 

@@ -2,14 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.petshopuser.mapper.ShopCartMapper">
     <insert id="batchInsertToShopCar">
-        INSERT INTO shopping_cart (id,commodity_id, specification_price_id, amount)
+        INSERT INTO shopping_cart (id,user_id,commodity_id, specification_price_id, amount)
         VALUES
         <foreach collection="infoList" item="item" separator=",">
-            (#{id},#{item.commodity_id}, #{item.specification_price_id}, #{item.amount})
+            (#{id},#{user_id},#{item.commodity_id}, #{item.specification_price_id}, #{item.amount})
         </foreach>
     </insert>
-
-    <select id="getList" resultType="com.example.petshopuser.entity.ShopCart">
+    <resultMap id="shopCart" type="com.example.petshopuser.entity.ShopCart">
+        <result column="id" property="id"/>
+        <result property="commodity_id" column="commodity_id"/>
+        <result property="specification_price_id" column="specification_price_id"/>
+        <result property="amount" column="amount"/>
+        <result property="user_id" column="user_id"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+    <select id="getList" resultMap="shopCart">
         select * from shopping_cart where user_id = #{user_id}
     </select>
 </mapper>
