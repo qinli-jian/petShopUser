@@ -41,14 +41,14 @@ public class CommodityServiceImpl {
             BigDecimal minPrice = commodityMapper.getCommodityMinPrice(commodityIntro.getId());
             commodityIntro.setPrice(minPrice);
             // 查询所属类别，包括一级类别 二级类比
-            List<String> categoryList = new ArrayList<>();
+            List<CommodityCategoryDTO> categoryList = new ArrayList<>();
             String categoryId = commodityIntro.getCategoryId();
             CommodityCategoryDTO commodityCategoryDTO = commodityMapper.getCategoryById(categoryId);
             categoryId = commodityCategoryDTO.getP_level_id();
             System.out.println(commodityCategoryDTO);
-            categoryList.add(commodityCategoryDTO.getCategory_name());
+            categoryList.add(commodityCategoryDTO);
             CommodityCategoryDTO p_commodityCategoryDTO = commodityMapper.getCategoryById(categoryId);
-            categoryList.add(p_commodityCategoryDTO.getCategory_name());
+            categoryList.add(p_commodityCategoryDTO);
             commodityIntro.setCategory(categoryList);
         }
         return commodityIntroDTOList;

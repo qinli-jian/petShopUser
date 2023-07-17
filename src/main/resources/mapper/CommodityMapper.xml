@@ -50,6 +50,8 @@
         <result column="category_id" property="categoryId"/>
         <result column="createtime" property="createtime"/>
         <result column="total_sales" property="total_sales"/>
+        <result property="total_sales" column="total_sales"/>
+        <result property="price" column="min_price"/>
     </resultMap>
 
     <select id="getAllCommodityIntro" resultMap="commodityIntroDTO">
@@ -80,6 +82,7 @@
         select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
         from commodity c
         INNER JOIN specification_price s ON c.id = s.commodity_id
+        WHERE name LIKE CONCAT('%', #{kw}, '%')
         GROUP BY c.id
         <choose>
             <when test="ranking == 'P_ASC'">
@@ -225,7 +228,11 @@
     </select>
 
     <select id="getCommodityIntroById" resultMap="commodityIntroDTO">
-        select * from commodity where id = #{commodity_id}
+        select c.*,sum(sp.sales_volume) as total_sales,MIN(sp.price) as min_price
+        from commodity c
+        inner join specification_price sp on c.id = sp.commodity_id
+        where c.id = #{commodity_id}
+        group by c.id
     </select>
 
     <resultMap id="specification_price" type="com.example.petshopuser.entity.Specification_price">
