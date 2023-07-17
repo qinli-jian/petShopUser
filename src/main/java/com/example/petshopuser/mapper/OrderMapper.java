@@ -19,6 +19,12 @@ public interface OrderMapper extends BaseMapper<Order> {
 
     boolean putOrderStatus(Order_Status order_status);
 
+    String findStatusId(String status_description);
+
+    Boolean deleteOrderById(String order_id);
+
+    Boolean deleteOrderStatusByOrderId(String order_id);
+
     Status_description findStatusById(String id);
 
     boolean putOCS(Order_commodity_specification OCS);
@@ -26,4 +32,6 @@ public interface OrderMapper extends BaseMapper<Order> {
     List<Order_commodity_specification> findOCSByOrderId(String order_id);
 
     List<Order> getOrderByUserId(String user_id);
+
+    List<String> getOrderIdsByUId(String user_id);
 }

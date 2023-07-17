@@ -111,7 +111,9 @@ public class Utils {
         }
     }
 
+
     static public String sendImageToDjango(String filePath, String uploadUrl){
+
         RestTemplate restTemplate = new RestTemplate();
 
         // Configure the RestTemplate with a ResourceHttpMessageConverter

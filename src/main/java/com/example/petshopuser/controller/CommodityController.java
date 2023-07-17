@@ -39,19 +39,24 @@ public class CommodityController {
     public CommodityController(SnowflakeIdWorker snowflakeIdWorker) {
         this.snowflakeIdWorker = snowflakeIdWorker;
     }
-
+    //商品详情查询
     @GetMapping("/details")
-    public ReturnObj getCommodityById(@RequestParam(value = "commodity_id") String commodity_id) {
+    public ReturnObj getCommodityById(@RequestParam String id) {
         ReturnObj returnObj = new ReturnObj();
         Map<String, Object> data = new HashMap<>();
-        Commodity commodity = commodityService.getCommodityById(commodity_id);
+        Map<String,Object> commodityO = new HashMap<>();
+        Commodity commodity = commodityService.getCommodityById(id); //根据商品id查询商品
+
         if (commodity != null){
-            data.put("commodity", commodity);
+            commodityO.put("id", commodity.getId());
+            commodityO.put("name", commodity.getName());
+            commodityO.put("imgs",commodity.getImgs().split(", "));
+
             System.out.println(commodity.getCategory_id());
-            Category category = commodityService.getCategoryById2(commodity.getCategory_id());
+            Category category = commodityService.getCategoryById2(commodity.getCategory_id());  //获取商品一级分类
             if(category!=null){
-                Category category1 = commodityService.getCategoryById2(category.getP_level_id());
-                if(category1!=null){
+                Category category1 = commodityService.getCategoryById2(category.getP_level_id()); //获取商品二级分类
+                if(category1!=null){   //添加商品分类
                     data.put("categoryLevel"+category.getLevel(), category.getCategory_name());
                     data.put("categoryLevel"+category1.getLevel(), category1.getCategory_name());
                 }else {
@@ -64,30 +69,45 @@ public class CommodityController {
                 returnObj.setMsg("该分类不存在");
                 return returnObj;
             }
+
+
+
         }
         else {
             returnObj.setCode("500");
             returnObj.setMsg("error");
             return returnObj;
         }
-        List<Specification_price> specification_prices = commodityService.getAllByCommodityId(commodity.getId());
-        System.out.println(specification_prices);
+
+        List<Specification_price> specification_prices = commodityService.getAllByCommodityId(commodity.getId()); //根据商品id、获取规格及价格
+        if(specification_prices==null){
+            returnObj.setCode("500");
+            returnObj.setMsg("error");
+            return returnObj;
+        }
         List<Map<String, Object>> objects = new ArrayList<>();
         for (Specification_price specification_price : specification_prices) {
-            System.out.println(specification_price.getSpecification_ids());
             if (specification_price.getSpecification_ids() != null) {
-                String[] temp_ids = specification_price.getSpecification_ids().split(",");
-                List<Specification> specifications = new ArrayList<>();
+                String[] temp_ids = specification_price.getSpecification_ids().split(","); //分割规格id
+                Map<String,Object> dataDTO = new HashMap<>();
+                dataDTO.put("price", specification_price.getPrice());
+                dataDTO.put("sales_volume",specification_price.getSales_volume());
+                dataDTO.put("inventory",specification_price.getInventory());
                 for (String temp_id : temp_ids) {
-                    specifications.add(commodityService.getBySpecificationId(temp_id));
+                    Map<String,Object> specificationDTO = new HashMap<>();
+                    Specification specification_item = commodityService.getBySpecificationId(temp_id);
+                    if(specification_item!=null){
+                        specificationDTO.put("specification_type", specification_item.getType());
+                        specificationDTO.put("specification_name", specification_item.getSpecification_name());
+                    }
+                    specificationDTO.put("Object",dataDTO);
+                    dataDTO = specificationDTO;
                 }
-                Map<String, Object> e = new HashMap<>();
-                e.put("specifications", specifications);
-                e.put("price", specification_price.getPrice());
-                objects.add(e);
+                objects.add(dataDTO);
             }
         }
-        data.put("specifications_price", objects);
+        commodityO.put("specifications",objects);
+        data.put("commodity", commodityO);
         returnObj.setData(data);
         returnObj.setMsg("success");
         returnObj.setCode("200");
@@ -133,12 +153,12 @@ public class CommodityController {
         returnObj.setData(commodityList);
         return returnObj;
     }
-
+    //获取所有分类
     @GetMapping("/getAllCategory")
     public ReturnObj getAllCategory(){
         ReturnObj returnObj = new ReturnObj();
         try {
-            List<CommodityCategoryDTO> categorys = commodityService.getAllCategory();
+            List<CommodityCategoryDTO> categorys = commodityService.getAllCategory();  //获取所有分类列表
             returnObj.setCode(Constants.CODE_200);
             returnObj.setMsg("success");
             returnObj.setData(categorys);
@@ -150,7 +170,7 @@ public class CommodityController {
         }
         return returnObj;
     }
-
+    //根据商品id获取所有该商品规格
     @GetMapping("/getAllSpecification")
     public ReturnObj getAllSpecification(@RequestParam(value = "comodity_id") String comodity_id){
         ReturnObj returnObj =new ReturnObj();

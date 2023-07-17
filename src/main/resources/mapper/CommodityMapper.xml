@@ -18,6 +18,8 @@
         <result column="commodity_id" property="commodity_id"/>
         <result column="specification_ids" property="specification_ids"/>
         <result column="price" property="price"/>
+        <result column="sales_volume" property="sales_volume"/>
+        <result column="inventory" property="inventory"/>
         <result column="img" property="img"/>
     </resultMap>
     <select id="getAllByCommodityId" resultMap="getAllByCommodityIdDTO">
@@ -41,7 +43,7 @@
         <result column="create_time" property="create_time"/>
     </resultMap>
     <select id="getAllSpecification" resultMap="getAllSpecificationDTO">
-        select * from specifications where comodity_id=#{comodity_id}
+        select * from specifications where commodity_id=#{commodity_id}
     </select>
 
     <resultMap id="commodityIntroDTO" type="com.example.petshopuser.entity.DTO.CommodityIntroDTO">
