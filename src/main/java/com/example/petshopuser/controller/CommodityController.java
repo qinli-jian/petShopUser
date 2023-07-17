@@ -105,15 +105,23 @@ public class CommodityController {
             returnObj.setMsg("params error");
             return returnObj;
         }
+        System.out.println(kw);
+        System.out.println(category_id.isEmpty());
+        System.out.println(pageNum);
+        System.out.println(pageSize);
+        System.out.println(ranking);
         List<CommodityIntroDTO> commodityList = null;
         //
-        if(kw==null && category_id==null || kw.isEmpty() && category_id.isEmpty()){
+        if((kw==null || kw.isEmpty()) && (category_id==null || category_id.isEmpty())){
+            System.out.println("======所有");
             // 搜索全部的，返回商品的简介对象
             commodityList = commodityService.getAllCommodityIntro(pageNum,pageSize,ranking);
-        } else if (kw!=null && category_id==null || !kw.isEmpty() && category_id.isEmpty()) {
+        } else if ((kw!=null || !kw.isEmpty()) && (category_id==null ||  category_id.isEmpty())) {
             // 根据kw关键字模糊
+            System.out.println("======关键字");
             commodityList = commodityService.getCommodityIntroByKW(kw,pageNum,pageSize,ranking);
-        }else if (kw==null && category_id!=null || kw.isEmpty() && !category_id.isEmpty()) {
+        }else if ((kw==null && kw.isEmpty()) || (category_id!=null && !category_id.isEmpty())) {
+            System.out.println("======分类");
             // 根据类别的ID进行搜索，这个ID有可能是一级或者是二级的
             commodityList = commodityService.getCommodityIntroByCategoryId(category_id,pageNum,pageSize,ranking);
         }else{

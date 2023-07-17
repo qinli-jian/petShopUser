@@ -23,8 +23,8 @@ public class ShopCartController {
     @GetMapping("/list")
     public ReturnObj getShopCarList(@RequestParam(value = "user_id") String user_id){
         ReturnObj returnObj = new ReturnObj();
+        List<ShopCarDTO> shopCarDTOList = shopCartService.getList(user_id);
         try{
-            List<ShopCarDTO> shopCarDTOList = shopCartService.getList(user_id);
             returnObj.setCode(Constants.CODE_200);
             returnObj.setMsg("success");
             returnObj.setData(shopCarDTOList);
@@ -37,7 +37,7 @@ public class ShopCartController {
 
     // 加入商品到购物车
     @PostMapping("/addtoshopcart")
-    public ReturnObj addToShopCart(@RequestBody Map<String,ArrayList<Map<String,String>>> addToShopCartInfo,@RequestParam(value = "user_id") String user_id){
+    public ReturnObj addToShopCart(@RequestParam(value = "user_id") String user_id,@RequestBody Map<String,ArrayList<Map<String,String>>> addToShopCartInfo){
         ReturnObj returnObj = new ReturnObj();
 
 //        String user_id = addToShopCartInfo.get("user_id");
@@ -46,6 +46,9 @@ public class ShopCartController {
         // commodity_id、specification_price_id和amount数据都在infoList里面，只需要循环去除就行
         ArrayList<Map<String, String>> infoList = addToShopCartInfo.get("infoList");
         int am = infoList.size();
+        System.out.println("shopcart");
+        System.out.println(user_id);
+        System.out.println(infoList);
         int f = shopCartService.insert_shopCart(user_id,infoList);
         if(am!=f){
             returnObj.setCode(Constants.CODE_500);
