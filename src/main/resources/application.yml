@@ -13,14 +13,17 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  data:
+    mongodb:
+      uri: mongodb://petShopRoot:petShopRoot@qin.qins.online/petShop
 upload:
   file:
     location: "file:///E:/tempstatic/"
     path: /static/**
 
-#mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #  global-config:
 #    db-config:
 #      table-prefix: ms_

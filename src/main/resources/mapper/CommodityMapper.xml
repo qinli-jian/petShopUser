@@ -18,6 +18,7 @@
         <result column="commodity_id" property="commodity_id"/>
         <result column="specification_ids" property="specification_ids"/>
         <result column="price" property="price"/>
+        <result column="img" property="img"/>
     </resultMap>
     <select id="getAllByCommodityId" resultMap="getAllByCommodityIdDTO">
         select * from specification_price where commodity_id = #{commodity_id};
@@ -128,12 +129,21 @@
         select * from commodity_categories where p_level_id = #{p_level_id} and level=2
     </select>
     <select id="getCommodityIntroByCategoryId" resultMap="commodityIntroDTO">
-        select * from commodity order by create_time desc limit #{offset}, #{pageSize}
+        select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
+        from commodity c
+        INNER JOIN specification_price s ON c.id = s.commodity_id
+        where category_id=#{category_id}
+        GROUP BY c.id
+        order by create_time desc  limit #{offset}, #{pageSize}
     </select>
     <select id="getCommodityIntroByCategoryIdList" resultMap="commodityIntroDTO">
         select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
         from commodity c
         INNER JOIN specification_price s ON c.id = s.commodity_id
+        WHERE category_id IN
+        <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
         GROUP BY c.id
         <choose>
             <when test="ranking == 'P_ASC'">
@@ -152,16 +162,16 @@
 
             </otherwise>
         </choose>
-        WHERE category_id IN
-        <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
-            #{id}
-        </foreach>
         ORDER BY create_time DESC limit #{offset}, #{pageSize}
     </select>
     <select id="getCommodityIntrosByCategoryId_Kw" resultMap="commodityIntroDTO">
         select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
         from commodity c
         INNER JOIN specification_price s ON c.id = s.commodity_id
+        WHERE name LIKE CONCAT('%', #{kw}, '%') and category_id IN
+        <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
         GROUP BY c.id
         <choose>
             <when test="ranking == 'P_ASC'">
@@ -180,10 +190,6 @@
 
             </otherwise>
         </choose>
-        WHERE name LIKE CONCAT('%', #{kw}, '%')
-        <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
-            #{id}
-        </foreach>
         order by create_time desc
         limit #{offset},#{pageSize}
     </select>
@@ -203,11 +209,9 @@
 
     <resultMap id="findCommentsBycommodity_IdDTO" type="com.example.petshopuser.entity.Comment">
         <result column="id" property="id" />
-        <result column="replyComments_id" property="replyComments_id"/>
         <result column="user_id" property="user_id"/>
         <result column="commodity_id" property="commodity_id"/>
         <result column="content" property="content"/>
-        <result column="imgs" property="imgs"/>
         <result column="rating" property="rating"/>
     </resultMap>
     <select id="findCommentsByCommodity_Id" resultMap="findCommentsBycommodity_IdDTO">
@@ -216,11 +220,9 @@
 
     <resultMap id="findCommentsByIdDTO" type="com.example.petshopuser.entity.Comment">
         <result column="id" property="id" />
-        <result column="replyComments_id" property="replyComments_id"/>
         <result column="user_id" property="user_id"/>
         <result column="commodity_id" property="commodity_id"/>
         <result column="content" property="content"/>
-        <result column="imgs" property="imgs"/>
         <result column="rating" property="rating"/>
     </resultMap>
     <select id="findCommentsById" resultMap="findCommentsByIdDTO">

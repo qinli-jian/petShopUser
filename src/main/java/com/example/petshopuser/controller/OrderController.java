@@ -7,10 +7,7 @@ import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
 import com.example.petshopuser.service.impl.UserServiceImpl;
 import com.example.petshopuser.utils.SnowflakeIdWorker;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -32,10 +29,10 @@ public class OrderController {
     }
 
 
-    @PostMapping("/details")
-    public ReturnObj getOrderByCommodityIdAndUserId(@RequestBody Map<String,String> request_form){
+    @GetMapping("/details")
+    public ReturnObj getOrderByCommodityIdAndUserId(@RequestParam(value = "order_id") String order_id){
         ReturnObj returnObj = new ReturnObj();
-        String order_id = request_form.get("order_id");
+//        String order_id = request_form.get("order_id");
         List<Order> orders = orderService.getOrderById(order_id);//获取订单数据
         System.out.println(orders);
         if(orders!=null){

@@ -80,7 +80,9 @@ public class CommodityServiceImpl {
         List<CommodityIntroDTO> commodityIntroDTOList = null;
         //首先在商品表中通过对比级别id进行查询
         commodityIntroDTOList = commodityMapper.getCommodityIntroByCategoryId(category_id,offset,pageSize,"");
-        if(commodityIntroDTOList==null){
+        System.out.println("列表");
+        System.out.println(commodityIntroDTOList);
+        if(commodityIntroDTOList==null || commodityIntroDTOList.size()==0){
             //然后如果为空的话就去类别表中查询一级的id对比，然后的到级别对象列表
             List<CommodityCategoryDTO> childCategorys = commodityMapper.getChildCategoryByPlevel(category_id);
             ArrayList<String> child_category_ids = new ArrayList<>();
@@ -89,6 +91,8 @@ public class CommodityServiceImpl {
                 // 直接拿到二级分类的级别id
                 child_category_ids.add(childCategory.getId());
             }
+            System.out.println("二级分类ID");
+            System.out.println(child_category_ids);
             commodityIntroDTOList = commodityMapper.getCommodityIntroByCategoryIdList(child_category_ids,offset,pageSize,ranking);
         }
 
@@ -100,9 +104,11 @@ public class CommodityServiceImpl {
         // 判断category_id是一级还是二级
         CommodityCategoryDTO categoryById = commodityMapper.getCategoryById(category_id);
         ArrayList<String> child_category_ids = new ArrayList<>();
-        if(categoryById.getLevel()==String.valueOf(1)){
+        if(categoryById.getLevel().equals(String.valueOf(1))){
             //如果是一级则需要查询其二级的ids
             List<CommodityCategoryDTO> childCategoryByPlevel = commodityMapper.getChildCategoryByPlevel(category_id);
+            System.out.println("关键字和分类");
+            System.out.println(childCategoryByPlevel);
             for (CommodityCategoryDTO commodityCategory :
                     childCategoryByPlevel) {
                 child_category_ids.add(commodityCategory.getId());
@@ -111,6 +117,9 @@ public class CommodityServiceImpl {
             // 如果是二级
             child_category_ids.add(category_id);
         }
+        System.out.println("关键字和分类");
+        System.out.println(kw);
+        System.out.println(child_category_ids);
         List<CommodityIntroDTO> commodityIntroDTOList = commodityMapper.getCommodityIntrosByCategoryId_Kw(kw,child_category_ids,offset,pageSize,ranking);
         return commodityIntroDTOList;
     }
