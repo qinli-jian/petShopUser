@@ -42,7 +42,7 @@ public class Address {
         this.postcode = address_obj.get("postcode");
         this.phone = address_obj.get("phone");
         String isdefulat;
-        if(Objects.equals(address_obj.get("defaultAddress"), "true")){
+        if("true".equals(address_obj.get("defaultAddress")) || "1".equals(String.valueOf(Integer.valueOf(address_obj.get("defaultAddress"))))){
             isdefulat = "1";
         }else{
             isdefulat = "0";

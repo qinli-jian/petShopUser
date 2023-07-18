@@ -17,6 +17,7 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -203,8 +204,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 || address_obj.get("postcode").isEmpty() || address_obj.get("phone").isEmpty()){
             return -1;
         }
-
+        System.out.println("address_obj");
+        System.out.println(address_obj);
         Address new_address = new Address(address_obj);
+        System.out.println("新增地址");
+        System.out.println(new_address);
         // 根据user_id进行插入new_address
         int flag = userMapper.insert_userAddress(user_id,new_address);
 
@@ -212,11 +216,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     }
 
+    @Transactional
     public int updateAddress(String user_id, String address) {
         Gson gson = new Gson();
         HashMap<String, String> address_obj = new HashMap<>();
         address_obj = gson.fromJson(address, address_obj.getClass());
         Address new_address = new Address(address_obj);
+
+        if(new_address.getDefaultAddress().equals("1")){
+            // 把其他地址设置为0
+            int f = userMapper.update_AlldefaultAddress(user_id,"0");
+//            int f2 = userMapper.update_oneDefaultAddress(new_address.getId(),"1");
+//            if(f>0&&f2>0){
+//
+//            }
+        }
         System.out.println("新地址");
         System.out.println(new_address);
         int flag = userMapper.updateAddress(user_id,new_address);
