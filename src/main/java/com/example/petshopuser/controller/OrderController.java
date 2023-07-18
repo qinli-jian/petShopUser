@@ -71,6 +71,9 @@ public class OrderController {
         order.put("address",order_list.get(0).getOrder_address());
         order.put("waybill", order_list.get(0).getWaybill());
         order.put("logistics_company", order_list.get(0).getLogistics_company());
+        System.out.println(order_list);
+        System.out.println(order_list.get(0).getAddress_id());
+        order.put("address_msg", orderService.getAddressById(order_list.get(0).getAddress_id()));
         List<Map<String,Object>> commodity_list = new ArrayList<>();
         BigDecimal total_price =new BigDecimal(0);
         for(Order user_order_item : order_list){
@@ -148,7 +151,9 @@ public class OrderController {
             order.setOrder_id(order_id);
             order.setUser_id(user_id);
             order.setCommodity_id(commodity_id);
-            order.setOrder_address(orderDTO.getOrder_address());
+            order.setAddress_id(orderDTO.getOrder_address_id());
+            Address address = orderService.getAddressById(orderDTO.getOrder_address_id());
+            order.setOrder_address(address.getProvince()+address.getCity()+address.getCounty()+address.getDetailed_address());
             order.setSpecification(specification);
             order.setNum(num);
             order.setTotal_price(price);
@@ -169,12 +174,96 @@ public class OrderController {
         order_status1.setStatus_description(orderService.findStatusById("3").getStatus_description());//状态->待付款
         if(orderService.putOrderStatus(order_status)&&
                 orderService.putOrderStatus(order_status1)){
-            reTurnData(returnObj, order_id);
+            Map<String,Object> returnData = new HashMap<>();
+            returnData.put("order", orderService.getOrderById(order_id));
+            returnData.put("order_status", orderService.getAllStatusById(order_id));
+            returnData.put("address_msg", orderService.getAddressById(orderDTO.getOrder_address_id()));
+            returnObj.setData(returnData);
+            returnObj.setMsg("success");
+            returnObj.setCode("200");
         }else{
             returnObj.setCode("500");
             returnObj.setMsg("error");
             returnObj.setData(false);
         }
+        return returnObj;
+    }
+    //批量添加订单
+    @PostMapping("/create_all")
+    public ReturnObj createOrderAll(@RequestBody List<OrderDTO> orderDTOList){
+        ReturnObj returnObj = new ReturnObj();
+        List<Map<String,Object>> ReturnDataList = new ArrayList<>();
+        for(OrderDTO orderDTO : orderDTOList) {
+            String order_id = String.valueOf(snowflakeIdWorker.nextId());
+            String user_id = orderDTO.getUser_id();
+
+            for (int i = 0; i < orderDTO.getCommodity_dto_list().size(); i++) {
+                BigDecimal price = orderDTO.getCommodity_dto_list().get(i).getTotal_price();
+                String commodity_id = orderDTO.getCommodity_dto_list().get(i).getCommodity_id();
+                String specification = orderDTO.getCommodity_dto_list().get(i).getSpecification();
+
+                String[] specifications_C = specification.split("\\+"); //分割规格名
+                List<Specification> specificationList = commodityService.getAllSpecification(commodity_id);
+                int sign = 0;
+                for (String items : specifications_C) {    //判断规格是否存在
+                    for (Specification item : specificationList) {
+                        if (item.getSpecification_name().equals(items)) {
+                            sign = 1;
+                            break;
+                        }
+                    }
+                    if (sign == 0) {
+                        returnObj.setCode("500");
+                        returnObj.setMsg(items + "规格不存在");
+                        returnObj.setData(false);
+                    }
+                    sign = 0;
+                }
+
+                Integer num = orderDTO.getCommodity_dto_list().get(i).getNum();
+                Order order = new Order();
+                order.setOrder_id(order_id);
+                order.setUser_id(user_id);
+                order.setCommodity_id(commodity_id);
+                order.setAddress_id(orderDTO.getOrder_address_id());
+                Address address = orderService.getAddressById(orderDTO.getOrder_address_id());
+                order.setOrder_address(address.getProvince()+address.getCity()+address.getCounty()+address.getDetailed_address());
+                order.setSpecification(specification);
+                order.setNum(num);
+                order.setTotal_price(price);
+                if (!orderService.putOrder(order)) {
+                    returnObj.setCode("500");
+                    returnObj.setMsg("error");
+                    returnObj.setData(false);
+                    return returnObj;
+                }
+            }
+
+            Order_Status order_status = new Order_Status();     //插入订单初始状态
+            order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
+            order_status.setOrder_id(order_id);
+            order_status.setStatus_description(orderService.findStatusById("2").getStatus_description()); //状态->已下单
+            Order_Status order_status1 = new Order_Status(order_status);
+            order_status1.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
+            order_status1.setStatus_description(orderService.findStatusById("3").getStatus_description());//状态->待付款
+            if (orderService.putOrderStatus(order_status) &&
+                    orderService.putOrderStatus(order_status1)) {
+                Map<String,Object> returnData = new HashMap<>();
+                returnData.put("order", orderService.getOrderById(order_id));
+                returnData.put("order_status", orderService.getAllStatusById(order_id));
+                returnData.put("address_msg", orderService.getAddressById(orderDTO.getOrder_address_id()));
+                ReturnDataList.add(returnData);
+                returnObj.setMsg("success");
+                returnObj.setCode("200");
+            } else {
+                returnObj.setCode("500");
+                returnObj.setMsg("error");
+                returnObj.setData(false);
+            }
+        }
+        returnObj.setData(ReturnDataList);
+        returnObj.setMsg("success");
+        returnObj.setCode("200");
         return returnObj;
     }
 
@@ -405,6 +494,8 @@ public class OrderController {
                     (order_status.getStatus_description().equals(status))){
                 order.put("order_id", order_id_item);
                 order.put("status", order_status);  //设置订单状态
+                order.put("address_msg",
+                        orderService.getAddressById(orderService.getOrderById(order_id_item).get(0).getAddress_id()));
 
                 List<Order> user_order_list = orderService.getOrderByUserId(request_form.get("user_id"));
                 order.put("create_time", user_order_list.get(0).getCreate_time());

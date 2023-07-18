@@ -1,9 +1,6 @@
 package com.example.petshopuser.service.impl;
 
-import com.example.petshopuser.entity.Order;
-import com.example.petshopuser.entity.Order_Status;
-import com.example.petshopuser.entity.Order_commodity_specification;
-import com.example.petshopuser.entity.Status_description;
+import com.example.petshopuser.entity.*;
 import com.example.petshopuser.mapper.OrderMapper;
 import org.springframework.stereotype.Service;
 
@@ -52,4 +49,6 @@ public class OrderServiceImpl {
 
     public Boolean deleteOrderById(String order_id){return (orderMapper.deleteOrderById(order_id)&&
             orderMapper.deleteOrderStatusByOrderId(order_id));}
+
+    public Address getAddressById(String id){return orderMapper.getAddressById(id);}
 }

@@ -12,10 +12,28 @@
         <result column="order_address" property="order_address"/>
         <result column="waybill" property="waybill"/>
         <result column="logistics_company" property="logistics_company"/>
+        <result column="address_id" property="address_id"/>
     </resultMap>
     <select id="getOrderById" resultMap="getOrderByIdDTO">
         SELECT * FROM order_info where order_id = #{order_id}
     </select>
+
+
+    <resultMap id="getAddressByIdDTO" type="com.example.petshopuser.entity.Address">
+        <result column="id" property="id" />
+        <result column="addressee" property="addressee"/>
+        <result column="province" property="province"/>
+        <result column="city" property="city"/>
+        <result column="county" property="county"/>
+        <result column="detailed_address" property="detailed_address"/>
+        <result column="postcode" property="postcode"/>
+        <result column="phone" property="phone"/>
+        <result column="defaultAddress" property="defaultAddress"/>
+    </resultMap>
+    <select id="getAddressById" resultMap="getAddressByIdDTO">
+        select * from address where id = #{id}
+    </select>
+
     <resultMap id="getAllStatusByIdDTO" type="com.example.petshopuser.entity.Order_Status">
         <result column="status_id" property="status_id" />
         <result column="order_id" property="order_id"/>
@@ -27,8 +45,8 @@
     </select>
 
     <insert id="putOrder">
-        insert into order_info(order_id,commodity_id,user_id,specification,num,total_price,order_address)
-        values(#{order_id},#{commodity_id},#{user_id},#{specification},#{num},#{total_price},#{order_address})
+        insert into order_info(order_id,commodity_id,user_id,specification,num,total_price,order_address,address_id)
+        values(#{order_id},#{commodity_id},#{user_id},#{specification},#{num},#{total_price},#{order_address},#{address_id})
     </insert>
     <insert id="putOrderStatus">
         insert into order_status(status_id,order_id,status_description)
