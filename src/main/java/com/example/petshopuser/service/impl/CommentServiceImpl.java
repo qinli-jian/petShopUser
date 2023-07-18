@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -42,11 +43,12 @@ public class CommentServiceImpl {
             query.with(Sort.by(Sort.Order.desc("createTime")));
             query.skip((pageNum - 1) * pageSize).limit(pageSize);
             comments = mongoTemplate.find(query, Comment.class);
-
+//            List<Comment> allSubComment = new ArrayList<>();
             for (Comment comment :
                     comments) {
                 //查询这个的所有回复的评论
                 List<Comment> sub_comments = getSubComments(comment.getId());
+//                allSubComment.addAll((ArrayList<Comment>) sub_comments);
                 comment.setSubComments((ArrayList<Comment>) sub_comments);
             }
             
@@ -63,12 +65,18 @@ public class CommentServiceImpl {
         sub_query.addCriteria(Criteria.where("reply_to_comment_id").is(comment_id));
         sub_query.with(Sort.by(Sort.Order.desc("createTime")));
         List<Comment> sub_comments = mongoTemplate.find(sub_query, Comment.class);
-        if (sub_comments.size()>0){
-            for (Comment comment :
-                    sub_comments) {
-                comment.setSubComments((ArrayList<Comment>) getSubComments(comment.getId()));
+
+        if (sub_comments != null && !sub_comments.isEmpty()) {
+            List<Comment> newComments = new ArrayList<>(); // 临时集合用于保存新的子评论
+            Iterator<Comment> iterator = sub_comments.iterator();
+            while (iterator.hasNext()) {
+                Comment comment = iterator.next();
+                List<Comment> subComments = getSubComments(comment.getId());
+                newComments.addAll(subComments);
             }
+            sub_comments.addAll(newComments); // 将新的子评论添加到原始集合中
         }
+
         return sub_comments;
     }
 
@@ -90,5 +98,17 @@ public class CommentServiceImpl {
             return result.getAverageRating();
         }
         return 0.0;
+    }
+
+    public long countCommentNum(String commodity_id) {
+        long commodityComments;
+        try {
+            Query query = new Query();
+            query.addCriteria(Criteria.where("commodity_id").is(commodity_id).and("reply_to_comment_id").is("-1"));
+            commodityComments = mongoTemplate.count(query, "commodityComments");
+        } catch (Exception e) {
+            return -1;
+        }
+        return commodityComments;
     }
 }

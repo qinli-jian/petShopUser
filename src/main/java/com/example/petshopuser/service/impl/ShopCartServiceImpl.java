@@ -13,6 +13,7 @@ import com.example.petshopuser.utils.SnowflakeIdWorker;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +30,8 @@ public class ShopCartServiceImpl {
 
     @Resource
     private CommodityMapper commodityMapper;
-
+    @Resource
+    private CommodityServiceImpl commodityService;
     public ShopCartServiceImpl(SnowflakeIdWorker snowflakeIdWorker) {
         this.snowflakeIdWorker = snowflakeIdWorker;
     }
@@ -38,6 +40,7 @@ public class ShopCartServiceImpl {
 
         List<ShopCart> shopCarList = shopCartMapper.getList(user_id);
         List<ShopCarDTO> shopCarDTOList = new ArrayList<>();
+        System.out.println(shopCarList);
         for (ShopCart shopCart:
              shopCarList) {
             ShopCarDTO shopCarDTO = new ShopCarDTO();
@@ -66,13 +69,20 @@ public class ShopCartServiceImpl {
             if(specification_price==null){
                 continue;
             }
-            List<String> specification_ids = Arrays.asList(specification_price.getSpecification_ids().split(","));
+            List<String> specification_ids = Arrays.asList(specification_price.getSpecification_ids().split(", "));
+
+            System.out.println(specification_ids);
+            for (String id :
+                    specification_ids) {
+                System.out.println(id);
+            }
 
                 // 规格对象列表
             ArrayList<Specification> specifications = new ArrayList<>();
             for (String specification_id:
                  specification_ids) {
-                Specification specification = commodityMapper.getBySpecificationId(specification_id);
+
+                Specification specification = commodityMapper.getBySpecificationId(specification_id.trim());
                 specifications.add(specification);
             }
             Specification_priceDTO specification_priceDTO = new Specification_priceDTO();
@@ -85,8 +95,11 @@ public class ShopCartServiceImpl {
 
             shopCarDTO.setSpecification_price(specification_priceDTO);
 
+            ArrayList<Specification_priceDTO> all_specification_price = commodityService.getSpecification_priceByCommodity_id(shopCart.getCommodity_id());
+            shopCarDTO.setAll_specification_price(all_specification_price);
             shopCarDTOList.add(shopCarDTO);
         }
+        System.out.println(shopCarDTOList);
         return shopCarDTOList;
     }
 
@@ -95,5 +108,15 @@ public class ShopCartServiceImpl {
         String id = String.valueOf(snowflakeIdWorker.nextId());
         int f = shopCartMapper.batchInsertToShopCar(id,user_id,infoList);
         return f;
+    }
+
+    public int update_shopcart(ShopCart shopCart) {
+        int flag = shopCartMapper.updateById(shopCart);
+        return flag;
+    }
+
+    public int deleteShopCart(String shop_cart_id) {
+        int flag = shopCartMapper.deleteById(shop_cart_id);
+        return flag;
     }
 }
