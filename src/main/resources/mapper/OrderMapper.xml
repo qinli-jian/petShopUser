@@ -27,8 +27,8 @@
     </select>
 
     <insert id="putOrder">
-        insert into order_info(order_id,commodity_id,user_id,specification,num,total_price)
-        values(#{order_id},#{commodity_id},#{user_id},#{specification},#{num},#{total_price})
+        insert into order_info(order_id,commodity_id,user_id,specification,num,total_price,order_address)
+        values(#{order_id},#{commodity_id},#{user_id},#{specification},#{num},#{total_price},#{order_address})
     </insert>
     <insert id="putOrderStatus">
         insert into order_status(status_id,order_id,status_description)
