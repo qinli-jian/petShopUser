@@ -85,14 +85,19 @@ public class CommodityController {
             returnObj.setMsg("error");
             return returnObj;
         }
+        Integer total_sales_volume = 0;
         List<Map<String, Object>> objects = new ArrayList<>();
         for (Specification_price specification_price : specification_prices) {
             if (specification_price.getSpecification_ids() != null) {
+
                 String[] temp_ids = specification_price.getSpecification_ids().split(","); //分割规格id
                 Map<String,Object> dataDTO = new HashMap<>();
+                dataDTO.put("specifications_id", specification_price.getId());
                 dataDTO.put("price", specification_price.getPrice());
                 dataDTO.put("sales_volume",specification_price.getSales_volume());
+                total_sales_volume+=specification_price.getSales_volume();
                 dataDTO.put("inventory",specification_price.getInventory());
+                List<Map<String,Object>> specifications =new ArrayList<>();
                 for (String temp_id : temp_ids) {
                     Map<String,Object> specificationDTO = new HashMap<>();
                     Specification specification_item = commodityService.getBySpecificationId(temp_id);
@@ -100,13 +105,14 @@ public class CommodityController {
                         specificationDTO.put("specification_type", specification_item.getType());
                         specificationDTO.put("specification_name", specification_item.getSpecification_name());
                     }
-                    specificationDTO.put("Object",dataDTO);
-                    dataDTO = specificationDTO;
+                   specifications.add(specificationDTO);
                 }
+                dataDTO.put("specifications", specifications);
                 objects.add(dataDTO);
             }
         }
-        commodityO.put("specifications",objects);
+        commodityO.put("specification_price",objects);
+        commodityO.put("total_sales_volume", total_sales_volume);
         data.put("commodity", commodityO);
         returnObj.setData(data);
         returnObj.setMsg("success");

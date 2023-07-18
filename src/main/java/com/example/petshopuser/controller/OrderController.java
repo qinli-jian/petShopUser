@@ -1,6 +1,7 @@
 package com.example.petshopuser.controller;
 
 import com.example.petshopuser.entity.*;
+import com.example.petshopuser.entity.DTO.OrderDTO;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
 import com.example.petshopuser.service.impl.UserServiceImpl;
@@ -13,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import static java.math.BigDecimal.ROUND_HALF_EVEN;
@@ -115,15 +120,15 @@ public class OrderController {
 
     // 创建订单
     @PostMapping("/create")
-    public ReturnObj createOrder(@RequestBody Map<String,List<String>> request_form){
+    public ReturnObj createOrder(@RequestBody OrderDTO orderDTO){
         ReturnObj returnObj = new ReturnObj();
         String order_id = String.valueOf(snowflakeIdWorker.nextId());
-        String user_id = request_form.get("user_id").get(0);
+        String user_id =  orderDTO.getUser_id();
 
-        for(int i=0;i<request_form.get("commodity_id").size();i++){
-            BigDecimal price =new BigDecimal(request_form.get("total_price").get(i));
-            String commodity_id = request_form.get("commodity_id").get(i);
-            String specification = request_form.get("specification").get(i);
+        for(int i=0;i<orderDTO.getCommodity_dto_list().size();i++){
+            BigDecimal price =orderDTO.getCommodity_dto_list().get(i).getTotal_price();
+            String commodity_id = orderDTO.getCommodity_dto_list().get(i).getCommodity_id();
+            String specification = orderDTO.getCommodity_dto_list().get(i).getSpecification();
 
             String[] specifications_C =specification.split("\\+"); //分割规格名
             List<Specification> specificationList = commodityService.getAllSpecification(commodity_id);
@@ -143,11 +148,12 @@ public class OrderController {
                 sign=0;
             }
 
-            Integer num =  Integer.parseInt(request_form.get("num").get(i));
+            Integer num =  orderDTO.getCommodity_dto_list().get(i).getNum();
             Order order = new Order();
             order.setOrder_id(order_id);
             order.setUser_id(user_id);
             order.setCommodity_id(commodity_id);
+            order.setOrder_address(orderDTO.getOrder_address());
             order.setSpecification(specification);
             order.setNum(num);
             order.setTotal_price(price);
@@ -457,11 +463,29 @@ public class OrderController {
 
     //模糊查询订单
     @PostMapping("/findOrdersByKey")
-    public ReturnObj findOrdersBykey(@RequestParam Map<String,String> request_form){
+    public ReturnObj findOrdersBykey(@RequestBody Map<String,String> request_form){
         ReturnObj returnObj = new ReturnObj();
         String status = request_form.get("status");
         String user_id = request_form.get("user_id");
         String key     = request_form.get("key");
+        Date date_begin = null;
+        Date date_end   = null;
+        if(!Objects.equals(request_form.get("date_begin"), "") && !Objects.equals(request_form.get("date_end"), "")){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            try {
+                LocalDate date_begin1 = LocalDate.parse( request_form.get("date_begin"), formatter);
+                LocalDate date_end1 = LocalDate.parse( request_form.get("date_end"), formatter);
+                date_begin = Date.from(date_begin1.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                date_end = Date.from(date_end1.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                System.out.println("Converted Date: " + date_begin);
+                System.out.println("Converted Date: " + date_end);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format: " + request_form.get("date_begin"));
+                System.out.println("Invalid date format: " + request_form.get("date_end"));
+                e.printStackTrace();
+            }
+        }
+
         List<String> order_id_list = orderService.getOrderIdsByUId(user_id);
         List<Map<String,Object>> order_list = new ArrayList<>();
         for(String order_id_item : order_id_list){
@@ -542,10 +566,27 @@ public class OrderController {
             }
             order_list.add(order);
         }
-        returnObj.setData(order_list);
 
-
-
+        List<Map<String,Object>> returnData = new ArrayList<>();
+        for(Map<String,Object> order : order_list){
+            System.out.println(date_begin);
+            System.out.println(date_end);
+            if(date_begin!=null&&date_end!=null){
+                System.out.println(date_begin.after((Date) order.get("create_time")));
+                System.out.println(date_end.before((Date) order.get("create_time")));
+                if(date_begin.after((Date) order.get("create_time"))||date_end.before((Date) order.get("create_time")))
+                    continue;
+            }
+            List<Map<String,Object>> commodity_listF = (List<Map<String, Object>>) order.get("commodity_list");
+            for (Map<String,Object> commodity : commodity_listF){
+                String commodity_name  = (String) commodity.get("commodity_name");
+                if(commodity_name.contains(key)){
+                    returnData.add(order);
+                    break;
+                }
+            }
+        }
+        returnObj.setData(returnData);
         returnObj.setMsg("success");
         returnObj.setCode("200");
         return returnObj;

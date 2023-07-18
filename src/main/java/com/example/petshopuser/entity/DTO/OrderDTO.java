@@ -3,13 +3,12 @@ package com.example.petshopuser.entity.DTO;
 import com.example.petshopuser.entity.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 public class OrderDTO {
-    private User user;
-    private Order order;
-    private List<CSDTO> CSDTOList;
-    private List<Order_Status> order_statusList;
-
+    private String user_id;
+    private String order_address;
+    private List<CommodityDTO> commodity_dto_list;
 }
