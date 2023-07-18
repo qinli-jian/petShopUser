@@ -4,10 +4,8 @@ import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.DTO.OrderDTO;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
-import com.example.petshopuser.service.impl.UserServiceImpl;
 import com.example.petshopuser.utils.SnowflakeIdWorker;
 
-import com.example.petshopuser.utils.Utils;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
-import static java.math.BigDecimal.ROUND_HALF_EVEN;
 
 @RestController
 @RequestMapping("/user_order")
@@ -30,8 +27,6 @@ public class OrderController {
     private OrderServiceImpl orderService;
     @Resource
     private CommodityServiceImpl commodityService;
-    @Resource
-    private UserServiceImpl userService;
 
     public OrderController(SnowflakeIdWorker snowflakeIdWorker) {
         this.snowflakeIdWorker = snowflakeIdWorker;
@@ -190,7 +185,27 @@ public class OrderController {
         String order_id = request_form.get("order_id");
         if(order_id!=null){
             List<Order_Status> order_statusList = orderService.getAllStatusById(order_id);  //根据订单id获取订单状态列表
-            if(!order_statusList.get(order_statusList.size()-1).getStatus_description()   //获取最新订单状态
+            Order_Status order_status1 = null;
+            if(!order_statusList.isEmpty()){
+                Order_Status latest_status =  order_statusList.get(0);
+                for(Order_Status item : order_statusList){
+
+                    if(Integer.parseInt(orderService.findStatusId(item.getStatus_description()))
+                            >Integer.parseInt(orderService.findStatusId(latest_status.getStatus_description()))){
+                        latest_status = item;
+                    }
+                }
+                order_status1 = latest_status;
+            }
+            else{
+                returnObj.setCode("500");
+                returnObj.setMsg(order_id+"该订单状态有错");
+                returnObj.setData(false);
+            }
+
+
+            assert order_status1 != null;
+            if(!order_status1.getStatus_description()   //获取最新订单状态
                     .equals(orderService.findStatusById("3").getStatus_description())){
                 returnObj.setCode("500");
                 returnObj.setMsg("该订单未下单或已支付");
@@ -363,7 +378,7 @@ public class OrderController {
         for(String order_id_item : order_id_list){
             Map<String,Object> order = new HashMap<>();
             List<Order_Status> order_statusList = orderService.getAllStatusById(order_id_item);
-            Order_Status order_status = null;
+            Order_Status order_status;
 
 
             if(!order_statusList.isEmpty()){
@@ -465,16 +480,20 @@ public class OrderController {
     @PostMapping("/findOrdersByKey")
     public ReturnObj findOrdersBykey(@RequestBody Map<String,String> request_form){
         ReturnObj returnObj = new ReturnObj();
+        System.out.println(request_form);
         String status = request_form.get("status");
         String user_id = request_form.get("user_id");
         String key     = request_form.get("key");
         Date date_begin = null;
         Date date_end   = null;
-        if(!Objects.equals(request_form.get("date_begin"), "") && !Objects.equals(request_form.get("date_end"), "")){
+        int date_sign = 0;
+        if(!Objects.equals(request_form.get("date_begin"), "*") && !Objects.equals(request_form.get("date_end"), "*")){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             try {
+                date_sign=1;
                 LocalDate date_begin1 = LocalDate.parse( request_form.get("date_begin"), formatter);
                 LocalDate date_end1 = LocalDate.parse( request_form.get("date_end"), formatter);
+                System.out.println(date_begin1+","+date_end1);
                 date_begin = Date.from(date_begin1.atStartOfDay(ZoneId.systemDefault()).toInstant());
                 date_end = Date.from(date_end1.atStartOfDay(ZoneId.systemDefault()).toInstant());
                 System.out.println("Converted Date: " + date_begin);
@@ -491,7 +510,7 @@ public class OrderController {
         for(String order_id_item : order_id_list){
             Map<String,Object> order = new HashMap<>();
             List<Order_Status> order_statusList = orderService.getAllStatusById(order_id_item);
-            Order_Status order_status = null;
+            Order_Status order_status ;
 
 
             if(!order_statusList.isEmpty()){
@@ -566,13 +585,13 @@ public class OrderController {
             }
             order_list.add(order);
         }
-
         List<Map<String,Object>> returnData = new ArrayList<>();
         for(Map<String,Object> order : order_list){
             System.out.println(date_begin);
             System.out.println(date_end);
-            if(date_begin!=null&&date_end!=null){
+            if(date_sign==1){
                 System.out.println(date_begin.after((Date) order.get("create_time")));
+                assert date_end != null;
                 System.out.println(date_end.before((Date) order.get("create_time")));
                 if(date_begin.after((Date) order.get("create_time"))||date_end.before((Date) order.get("create_time")))
                     continue;
