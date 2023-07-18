@@ -21,9 +21,9 @@ upload:
     location: "file:///E:/tempstatic/"
     path: /static/**
 
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #  global-config:
 #    db-config:
 #      table-prefix: ms_

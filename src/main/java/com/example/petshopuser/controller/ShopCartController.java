@@ -3,6 +3,7 @@ package com.example.petshopuser.controller;
 import com.example.petshopuser.common.Constants;
 import com.example.petshopuser.entity.DTO.ShopCarDTO;
 import com.example.petshopuser.entity.ReturnObj;
+import com.example.petshopuser.entity.ShopCart;
 import com.example.petshopuser.mapper.ShopCartMapper;
 import com.example.petshopuser.service.impl.ShopCartServiceImpl;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +59,60 @@ public class ShopCartController {
             returnObj.setMsg("insert success");
         }
 
+        return returnObj;
+    }
+
+    // 修改购物车接口
+    @PostMapping("/changeShopCart")
+    public ReturnObj changeShopCart(@RequestBody Map<String,String> changeInfo) {
+        ReturnObj returnObj = new ReturnObj();
+        int amount;
+        String specification_price_id;
+        String user_id;
+        String id;
+        String commodity_id;
+        try {
+            user_id = changeInfo.get("user_id");
+            id = changeInfo.get("shop_cart_id");
+            commodity_id = changeInfo.get("commodity_id");
+            specification_price_id = changeInfo.get("specification_price_id");
+            amount = Integer.parseInt(changeInfo.get("amount"));
+            if(amount<=0){
+                returnObj.setCode(Constants.CODE_400);
+                returnObj.setMsg("error");
+                return returnObj;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("error");
+            return returnObj;
+        }
+        ShopCart shopCart = new ShopCart(id, user_id, commodity_id, specification_price_id, amount);
+        // 更新数据库
+        int flag = shopCartService.update_shopcart(shopCart);
+        if(flag==1){
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }else{
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+        }
+        return returnObj;
+    }
+
+    // 删除购物车记录
+    @DeleteMapping("/deleteShopCart")
+    public ReturnObj deleteShopCart(@RequestParam(value = "shop_cart_id")String shop_cart_id){
+        ReturnObj returnObj = new ReturnObj();
+        int flag = shopCartService.deleteShopCart(shop_cart_id);
+        if(flag==1){
+            returnObj.setCode(Constants.CODE_200);
+            returnObj.setMsg("success");
+        }else{
+            returnObj.setCode(Constants.CODE_500);
+            returnObj.setMsg("failed");
+        }
         return returnObj;
     }
 

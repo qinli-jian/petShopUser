@@ -19,6 +19,13 @@ public class Comment {
     private String id;
     @Field
     private String user_id;
+
+    private String type;
+
+    private String username;
+
+    private String avatar;
+
     @Field
     private String commodity_id;
     @Field
@@ -32,9 +39,16 @@ public class Comment {
     @Field
     private  String reply_to_comment_id;
 
-    private  ArrayList<Comment> subComments;
 
-    public Comment(String user_id, String commodity_id, String content, ArrayList<String> images, String createTime, Integer rating, String reply_to_comment_id) {
+    private String reply_to_username="";
+
+    private  ArrayList<Comment> subComments= new ArrayList<>();
+
+    public Comment(String user_id,String type,String username,String avatar, String commodity_id, String content, ArrayList<String> images, String createTime, Integer rating, String reply_to_comment_id,String reply_to_username) {
+        this.reply_to_username = reply_to_username;
+        this.type = type;
+        this.username = username;
+        this.avatar = avatar;
         this.user_id = user_id;
         this.commodity_id = commodity_id;
         this.content = content;

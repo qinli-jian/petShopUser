@@ -141,7 +141,7 @@ public class CommodityServiceImpl {
         ArrayList<Specification_priceDTO> specification_priceDTOArrayList = new ArrayList<>();
         for (Specification_price specification_price :
                 specification_priceList) {
-            List<String> specification_ids = Arrays.asList(specification_price.getSpecification_ids().split(","));
+            List<String> specification_ids = Arrays.asList(specification_price.getSpecification_ids().split(", "));
             // 规格组合列表
             ArrayList<Specification> specifications = new ArrayList<>();
             for (String specification_id:
