@@ -30,4 +30,6 @@ public class Order {
     private String logistics_company;
     @TableField(value = "waybill")
     private String waybill;
+    @TableField(value = "address_id")
+    private String address_id;
 }

@@ -9,6 +9,6 @@ import java.util.List;
 @Data
 public class OrderDTO {
     private String user_id;
-    private String order_address;
+    private String order_address_id;
     private List<CommodityDTO> commodity_dto_list;
 }
