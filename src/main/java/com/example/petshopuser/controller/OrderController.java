@@ -358,12 +358,12 @@ public class OrderController {
             Map<String,Object> order = new HashMap<>();
             List<Order_Status> order_statusList = orderService.getAllStatusById(order_id_item);
             Order_Status order_status = null;
-
-
             if(!order_statusList.isEmpty()){
                 Order_Status latest_status =  order_statusList.get(0);
                 for(Order_Status item : order_statusList){
-
+                    System.out.println("订单");
+                    System.out.println(item.getStatus_description());
+                    System.out.println(latest_status.getStatus_description());
                     if(Integer.parseInt(orderService.findStatusId(item.getStatus_description()))
                             >Integer.parseInt(orderService.findStatusId(latest_status.getStatus_description()))){
                         latest_status = item;
