@@ -41,7 +41,7 @@
         <result column="create_time" property="create_time"/>
     </resultMap>
     <select id="getAllStatusById" resultMap="getAllStatusByIdDTO">
-        select * from order_status where order_id = #{order_id} order by create_time
+        select * from order_status where order_id = #{order_id} order by create_time DESC
     </select>
 
     <insert id="putOrder">
@@ -98,7 +98,7 @@
     </select>
 
     <select id="getOrderIdsByUId" resultType="String">
-        SELECT order_id FROM order_info  WHERE user_id = #{user_id} GROUP BY order_id
+        SELECT order_id FROM order_info  WHERE user_id = #{user_id} GROUP BY order_id order by create_time DESC
     </select>
     <delete id="deleteOrderById">
         delete from order_info where order_id = #{order_id}

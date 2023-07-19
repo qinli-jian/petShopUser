@@ -76,6 +76,7 @@
         select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
         from commodity c
         INNER JOIN specification_price s ON c.id = s.commodity_id
+        where state != 0
         GROUP BY c.id
         <choose>
             <when test="ranking == 'P_ASC'">
@@ -100,7 +101,7 @@
         select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
         from commodity c
         INNER JOIN specification_price s ON c.id = s.commodity_id
-        WHERE name LIKE CONCAT('%', #{kw}, '%')
+        WHERE name LIKE CONCAT('%', #{kw}, '%') and state != 0
         GROUP BY c.id
         <choose>
             <when test="ranking == 'P_ASC'">
@@ -149,7 +150,7 @@
         select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
         from commodity c
         INNER JOIN specification_price s ON c.id = s.commodity_id
-        where category_id=#{category_id}
+        where category_id=#{category_id} and state != 0
         GROUP BY c.id
         order by create_time desc  limit #{offset}, #{pageSize}
     </select>
@@ -185,7 +186,7 @@
         select c.*,SUM(s.sales_volume) as total_sales,MIN(s.price) as min_price
         from commodity c
         INNER JOIN specification_price s ON c.id = s.commodity_id
-        WHERE name LIKE CONCAT('%', #{kw}, '%') and category_id IN
+        WHERE name LIKE CONCAT('%', #{kw}, '%') and state != 0 and category_id IN
         <foreach collection="child_category_ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
