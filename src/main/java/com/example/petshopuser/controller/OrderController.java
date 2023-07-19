@@ -285,6 +285,7 @@ public class OrderController {
     @PostMapping("/create_all")
     public ReturnObj createOrderAll(@RequestBody List<OrderOneDTO> orderDTOList ){
         ReturnObj returnObj = new ReturnObj();
+        System.out.println(orderDTOList);
         List<Map<String,Object>> ReturnDataList = new ArrayList<>();
         String order_id = String.valueOf(snowflakeIdWorker.nextId());
         for(OrderOneDTO orderDTO : orderDTOList) {
@@ -818,6 +819,7 @@ public class OrderController {
     @PostMapping("/after_sale")
     public ReturnObj after_sale(@RequestBody After_sale_DTO after_sale_dto){
         ReturnObj returnObj =new ReturnObj();
+        System.out.println(after_sale_dto);
         String user_id = after_sale_dto.getUser_id();
         String order_id = after_sale_dto.getOrder_id();
         String after_sale_content = after_sale_dto.getAfter_sale_content();
@@ -839,12 +841,14 @@ public class OrderController {
             order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));  //雪花算法生成id
             order_status.setOrder_id(order_id);
             order_status.setStatus_description(orderService.findStatusById("10").getStatus_description());
+
             if(orderService.putOrderStatus(order_status)) {
                 List<Order_Status> order_statusList = orderService.getAllStatusById(order_id);
                 returnObj.setData(order_statusList);
                 returnObj.setCode("200");
                 returnObj.setMsg("修改成功");
             }
+
         }
         else{
             returnObj.setCode("500");
