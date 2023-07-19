@@ -25,6 +25,21 @@
     <select id="getAllByCommodityId" resultMap="getAllByCommodityIdDTO">
         select * from specification_price where commodity_id = #{commodity_id};
     </select>
+
+    <resultMap id="getSpecificationPriceByIdDTO" type="com.example.petshopuser.entity.Specification_price">
+        <result column="id" property="id" />
+        <result column="commodity_id" property="commodity_id"/>
+        <result column="specification_ids" property="specification_ids"/>
+        <result column="price" property="price"/>
+        <result column="sales_volume" property="sales_volume"/>
+        <result column="inventory" property="inventory"/>
+        <result column="img" property="img"/>
+    </resultMap>
+    <select id="getSpecificationPriceById" resultMap="getSpecificationPriceByIdDTO">
+        select * from specification_price where id = #{id};
+    </select>
+
+
     <resultMap id="getBySpecificationIdDTO" type="com.example.petshopuser.entity.Specification">
         <result column="id" property="id" />
         <result column="specification_name" property="specification_name"/>

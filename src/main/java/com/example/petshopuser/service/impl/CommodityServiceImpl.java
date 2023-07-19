@@ -29,6 +29,8 @@ public class CommodityServiceImpl {
     public List<Specification_price> getAllByCommodityId(String commodity_id){
         return commodityMapper.getAllByCommodityId(commodity_id);
     }
+    public Specification_price getSpecificationPriceById(String id){return commodityMapper.getSpecificationPriceById(id);}
+
     public Specification getBySpecificationId(String id) {
         return commodityMapper.getBySpecificationId(id);
     }

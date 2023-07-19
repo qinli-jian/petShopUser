@@ -22,6 +22,7 @@ public interface CommodityMapper extends BaseMapper<Commodity> {
     Commodity getCommodityById(String id);
 
     List<Specification_price> getAllByCommodityId(String commodity_id);
+    Specification_price getSpecificationPriceById(String id);
 
     Specification getBySpecificationId(String id);
 
