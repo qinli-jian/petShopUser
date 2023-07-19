@@ -281,6 +281,7 @@ public class OrderController {
     @PostMapping("/create_all")
     public ReturnObj createOrderAll(@RequestBody List<OrderDTO> orderDTOList){
         ReturnObj returnObj = new ReturnObj();
+        System.out.println(orderDTOList);
         List<Map<String,Object>> ReturnDataList = new ArrayList<>();
         for(OrderDTO orderDTO : orderDTOList) {
             String order_id = String.valueOf(snowflakeIdWorker.nextId());
