@@ -35,5 +35,7 @@ public interface OrderMapper extends BaseMapper<Order> {
 
     Address getAddressById(String id);
 
-    Boolean setAfterSale(After_sale_DTO after_sale_dto);
+    Boolean setAfterSale(After_sale after_sale);
+
+    String getServiceTypeById(String id);
 }
