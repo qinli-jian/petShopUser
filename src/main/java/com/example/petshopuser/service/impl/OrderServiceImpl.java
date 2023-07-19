@@ -1,10 +1,12 @@
 package com.example.petshopuser.service.impl;
 
 import com.example.petshopuser.entity.*;
+import com.example.petshopuser.entity.DTO.After_sale_DTO;
 import com.example.petshopuser.mapper.OrderMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.crypto.interfaces.PBEKey;
 import java.util.List;
 
 @Service
@@ -51,4 +53,8 @@ public class OrderServiceImpl {
             orderMapper.deleteOrderStatusByOrderId(order_id));}
 
     public Address getAddressById(String id){return orderMapper.getAddressById(id);}
+
+    public Boolean setAfterSale(After_sale after_sale){return orderMapper.setAfterSale(after_sale);}
+
+    public String getServiceTypeById(String id){return orderMapper.getServiceTypeById(id);}
 }
