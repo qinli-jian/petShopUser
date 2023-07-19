@@ -42,13 +42,14 @@ public class Address {
         this.postcode = address_obj.get("postcode");
         this.phone = address_obj.get("phone");
         String isdefulat;
-        if("true".equals(address_obj.get("defaultAddress")) || "1".equals(String.valueOf(Integer.valueOf(address_obj.get("defaultAddress"))))){
+        if (address_obj.get("defaultAddress").equals(true)||Boolean.TRUE.equals(address_obj.get("defaultAddress")) || "1".equals(String.valueOf(Integer.valueOf(address_obj.get("defaultAddress"))))) {
             isdefulat = "1";
-        }else{
+        } else {
             isdefulat = "0";
         }
 
-        this.defaultAddress = isdefulat;
+        this.defaultAddress = String.valueOf(isdefulat);
+
     }
 
     public Address(String id, String addressee, String province, String city, String county, String detailed_address, String postcode, String phone, String defaultAddress) {

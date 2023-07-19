@@ -116,4 +116,23 @@ public class ShopCartController {
         return returnObj;
     }
 
+    @DeleteMapping("/batchdelete")
+    public ReturnObj batchDeleteShopCart(@RequestBody Map<String,Object> deleteShopCartIdList){
+        ReturnObj returnObj = new ReturnObj();
+        System.out.println(deleteShopCartIdList);
+        try {
+            List<String> ids = (List<String>) deleteShopCartIdList.get("ids");
+            int flag = shopCartService.batchdelete(ids);
+            if(flag>0){
+                returnObj.setCode(Constants.CODE_200);
+                returnObj.setMsg("success");
+            }
+        }catch (Exception e){
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("参数错误");
+            return returnObj;
+        }
+        return returnObj;
+    }
+
 }
