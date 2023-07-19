@@ -51,6 +51,7 @@ public class CommodityController {
             commodityO.put("id", commodity.getId());
             commodityO.put("name", commodity.getName());
             commodityO.put("imgs",commodity.getImgs().split(", "));
+            commodityO.put("description_images",commodity.getDescription());
 
             System.out.println(commodity.getCategory_id());
             Category category = commodityService.getCategoryById2(commodity.getCategory_id());  //获取商品一级分类

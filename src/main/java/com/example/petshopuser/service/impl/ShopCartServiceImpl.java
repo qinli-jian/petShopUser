@@ -11,6 +11,7 @@ import com.example.petshopuser.mapper.CommodityMapper;
 import com.example.petshopuser.mapper.ShopCartMapper;
 import com.example.petshopuser.utils.SnowflakeIdWorker;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Wrapper;
@@ -115,8 +116,23 @@ public class ShopCartServiceImpl {
         return flag;
     }
 
+    @Transactional
     public int deleteShopCart(String shop_cart_id) {
         int flag = shopCartMapper.deleteById(shop_cart_id);
         return flag;
+    }
+
+    @Transactional
+    public int batchdelete(List<String> ids) {
+
+        for (String id :
+                ids) {
+            int flag = deleteShopCart(id);
+            if(flag<=0){
+                return -1;
+            }
+        }
+        return 1;
+
     }
 }
