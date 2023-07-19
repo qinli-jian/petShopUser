@@ -109,7 +109,11 @@
     </delete>
 
     <insert id="setAfterSale">
-        insert into after_sale(after_sale_id,user_id,order_id,service_type,after_sale_content,imgs)
-        values(#{after_sale_id},#{user_id},#{order_id},#{service_type},#{after_sale_content},#{imgs})
+        insert into after_sale(after_sale_id,user_id,order_id,service_type,after_sale_content,imgs,refund_price,refund_reason)
+        values(#{after_sale_id},#{user_id},#{order_id},#{service_type},#{after_sale_content},#{imgs},#{refund_price},#{refund_reason})
     </insert>
+
+    <select id="getServiceTypeById" resultType="String">
+        select service_type from service_type where id = #{id}
+    </select>
 </mapper>

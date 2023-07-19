@@ -54,5 +54,7 @@ public class OrderServiceImpl {
 
     public Address getAddressById(String id){return orderMapper.getAddressById(id);}
 
-    public Boolean setAfterSale(After_sale_DTO after_sale_dto){return orderMapper.setAfterSale(after_sale_dto);}
+    public Boolean setAfterSale(After_sale after_sale){return orderMapper.setAfterSale(after_sale);}
+
+    public String getServiceTypeById(String id){return orderMapper.getServiceTypeById(id);}
 }
