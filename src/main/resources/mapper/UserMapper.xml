@@ -36,6 +36,12 @@
     <update id="save_avatar">
         update user set avatar = #{filename} where id = #{user_id}
     </update>
+    <update id="update_AlldefaultAddress">
+        update address set defaultAddress = #{s} where user_id=#{user_id}
+    </update>
+    <update id="update_oneDefaultAddress">
+        update address set defaultAddress = #{s} where id=#{id}
+    </update>
     <delete id="delete_address">
         delete from address where id = #{address_id} and user_id=#{user_id}
     </delete>
