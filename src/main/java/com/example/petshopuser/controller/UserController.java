@@ -321,10 +321,11 @@ public class UserController {
         return returnObj;
     }
 
-    //添加收获地址
+    //添加收货地址
     @PostMapping("/addaddress")
     public ReturnObj addaddress(@RequestBody Map<String,String> address_form){
         ReturnObj returnObj = new ReturnObj();
+        System.out.println(address_form);
 
         String user_id = address_form.get("user_id");
         String address = address_form.get("address");

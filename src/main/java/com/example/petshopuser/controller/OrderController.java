@@ -2,6 +2,7 @@ package com.example.petshopuser.controller;
 
 import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.DTO.OrderDTO;
+import com.example.petshopuser.entity.DTO.OrderOneDTO;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
 import com.example.petshopuser.utils.SnowflakeIdWorker;
@@ -116,7 +117,7 @@ public class OrderController {
         return returnObj;
     }
 
-    // 创建订单
+    // 创建订单（一个订单多个商品）
     @PostMapping("/create")
     public ReturnObj createOrder(@RequestBody OrderDTO orderDTO){
         ReturnObj returnObj = new ReturnObj();
@@ -188,6 +189,94 @@ public class OrderController {
         }
         return returnObj;
     }
+
+    // 创建订单（一个订单一商品）
+    @PostMapping("/create_one")
+    public ReturnObj createOrderOne(@RequestBody OrderOneDTO orderDTO){
+        System.out.println(orderDTO);
+        ReturnObj returnObj = new ReturnObj();
+        String order_id = String.valueOf(snowflakeIdWorker.nextId());
+        String user_id =  orderDTO.getUser_id();
+        String commodity_id = orderDTO.getCommodity_id();
+        Integer num =  orderDTO.getNum();
+        String specification_price_id = orderDTO.getSpecification_price_id();
+        Specification_price specification_price = commodityService.getSpecificationPriceById(specification_price_id);
+
+        BigDecimal price = specification_price.getPrice().multiply(BigDecimal.valueOf(num));
+        String[] temp_ids = specification_price.getSpecification_ids().split(", "); //分割规格id
+        String specification = "";
+        int sign1=0;
+        for (String temp_id : temp_ids) {
+            sign1++;
+            System.out.println(temp_id);
+            Specification specification_item = commodityService.getBySpecificationId(temp_id);
+            System.out.println(specification_item);
+            specification=specification+specification_item.getSpecification_name();
+            if(sign1%2!=0)
+                specification+="+";
+        }
+
+
+        String[] specifications_C =specification.split("\\+"); //分割规格名
+        List<Specification> specificationList = commodityService.getAllSpecification(commodity_id);
+        int sign =0;
+        for(String items : specifications_C){    //判断规格是否存在
+            for(Specification item : specificationList){
+                if(item.getSpecification_name().equals(items)){
+                    sign=1;
+                    break;
+                }
+            }
+            if(sign==0){
+                returnObj.setCode("500");
+                returnObj.setMsg(items+"规格不存在");
+                returnObj.setData(false);
+            }
+            sign=0;
+        }
+        Order order = new Order();
+        order.setOrder_id(order_id);
+        order.setUser_id(user_id);
+        order.setCommodity_id(commodity_id);
+        order.setAddress_id(orderDTO.getOrder_address_id());
+        Address address = orderService.getAddressById(orderDTO.getOrder_address_id());
+        order.setOrder_address(address.getProvince()+address.getCity()+address.getCounty()+address.getDetailed_address());
+        order.setSpecification(specification);
+        order.setNum(num);
+        order.setTotal_price(price);
+        if(!orderService.putOrder(order)){
+            returnObj.setCode("500");
+            returnObj.setMsg("error");
+            returnObj.setData(false);
+            return returnObj;
+        }
+
+        Order_Status order_status = new Order_Status();     //插入订单初始状态
+        order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
+        order_status.setOrder_id(order_id);
+        order_status.setStatus_description(orderService.findStatusById("2").getStatus_description()); //状态->已下单
+        Order_Status order_status1 = new Order_Status(order_status);
+        order_status1.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
+        order_status1.setStatus_description(orderService.findStatusById("3").getStatus_description());//状态->待付款
+        if(orderService.putOrderStatus(order_status)&&
+                orderService.putOrderStatus(order_status1)){
+            Map<String,Object> returnData = new HashMap<>();
+            returnData.put("order", orderService.getOrderById(order_id));
+            returnData.put("order_status", orderService.getAllStatusById(order_id));
+            returnData.put("address_msg", orderService.getAddressById(orderDTO.getOrder_address_id()));
+            returnObj.setData(returnData);
+            returnObj.setMsg("success");
+            returnObj.setCode("200");
+        }else{
+            returnObj.setCode("500");
+            returnObj.setMsg("error");
+            returnObj.setData(false);
+        }
+        return returnObj;
+    }
+
+
+
     //批量添加订单
     @PostMapping("/create_all")
     public ReturnObj createOrderAll(@RequestBody List<OrderDTO> orderDTOList){
@@ -702,7 +791,6 @@ public class OrderController {
         returnObj.setCode("200");
         return returnObj;
     }
-
 
 
 
