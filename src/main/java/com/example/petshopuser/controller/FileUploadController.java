@@ -30,6 +30,11 @@ public class FileUploadController {
     private ReturnObj upload(MultipartFile image){
         ReturnObj returnObj = new ReturnObj();
         // 检查是否接收到文件
+        if(image==null){
+            returnObj.setCode(Constants.CODE_400);
+            returnObj.setMsg("param name error.");
+            return returnObj;
+        }
         if (image.isEmpty()) {
             returnObj.setCode(Constants.CODE_400);
             returnObj.setMsg("No file received.");

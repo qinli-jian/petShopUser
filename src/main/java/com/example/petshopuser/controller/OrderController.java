@@ -600,7 +600,7 @@ public class OrderController {
                 order.put("address_msg",
                         orderService.getAddressById(orderService.getOrderById(order_id_item).get(0).getAddress_id()));
 
-                List<Order> user_order_list = orderService.getOrderByUserId(request_form.get("user_id"));
+                List<Order> user_order_list = orderService.getOrderById(order_id_item);
                 order.put("create_time", user_order_list.get(0).getCreate_time());
                 List<Map<String,Object>> commodity_list = new ArrayList<>();
                 BigDecimal total_price =new BigDecimal(0);
