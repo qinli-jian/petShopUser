@@ -283,8 +283,8 @@ public class OrderController {
     public ReturnObj createOrderAll(@RequestBody List<OrderOneDTO> orderDTOList){
         ReturnObj returnObj = new ReturnObj();
         List<Map<String,Object>> ReturnDataList = new ArrayList<>();
+        String order_id = String.valueOf(snowflakeIdWorker.nextId());
         for(OrderOneDTO orderDTO : orderDTOList) {
-            String order_id = String.valueOf(snowflakeIdWorker.nextId());
             String user_id =  orderDTO.getUser_id();
             String commodity_id = orderDTO.getCommodity_id();
             Integer num =  orderDTO.getNum();
@@ -339,31 +339,30 @@ public class OrderController {
                 returnObj.setData(false);
                 return returnObj;
             }
-
-            Order_Status order_status = new Order_Status();     //插入订单初始状态
-            order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
-            order_status.setOrder_id(order_id);
-            order_status.setStatus_description(orderService.findStatusById("2").getStatus_description()); //状态->已下单
-            Order_Status order_status1 = new Order_Status(order_status);
-            order_status1.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
-            order_status1.setStatus_description(orderService.findStatusById("3").getStatus_description());//状态->待付款
-            if(orderService.putOrderStatus(order_status)&&
-                    orderService.putOrderStatus(order_status1)){
-                Map<String,Object> returnData = new HashMap<>();
-                returnData.put("order", orderService.getOrderById(order_id));
-                returnData.put("order_status", orderService.getAllStatusById(order_id));
-                returnData.put("address_msg", orderService.getAddressById(orderDTO.getOrder_address_id()));
-                ReturnDataList.add(returnData);
-                returnObj.setMsg("success");
-                returnObj.setCode("200");
-            }else{
-                returnObj.setCode("500");
-                returnObj.setMsg("error");
-                returnObj.setData(false);
-            }
-
-
         }
+
+        Order_Status order_status = new Order_Status();     //插入订单初始状态
+        order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
+        order_status.setOrder_id(order_id);
+        order_status.setStatus_description(orderService.findStatusById("2").getStatus_description()); //状态->已下单
+        Order_Status order_status1 = new Order_Status(order_status);
+        order_status1.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));
+        order_status1.setStatus_description(orderService.findStatusById("3").getStatus_description());//状态->待付款
+        if(orderService.putOrderStatus(order_status)&&
+                orderService.putOrderStatus(order_status1)){
+            Map<String,Object> returnData = new HashMap<>();
+            returnData.put("order", orderService.getOrderById(order_id));
+            returnData.put("order_status", orderService.getAllStatusById(order_id));
+            returnData.put("address_msg", orderService.getAddressById(orderDTOList.get(0).getOrder_address_id()));
+            ReturnDataList.add(returnData);
+            returnObj.setMsg("success");
+            returnObj.setCode("200");
+        }else{
+            returnObj.setCode("500");
+            returnObj.setMsg("error");
+            returnObj.setData(false);
+        }
+
         returnObj.setData(ReturnDataList);
         returnObj.setMsg("success");
         returnObj.setCode("200");
@@ -600,7 +599,7 @@ public class OrderController {
                 order.put("address_msg",
                         orderService.getAddressById(orderService.getOrderById(order_id_item).get(0).getAddress_id()));
 
-                List<Order> user_order_list = orderService.getOrderByUserId(request_form.get("user_id"));
+                List<Order> user_order_list = orderService.getOrderById(order_id_item);
                 order.put("create_time", user_order_list.get(0).getCreate_time());
                 List<Map<String,Object>> commodity_list = new ArrayList<>();
                 BigDecimal total_price =new BigDecimal(0);
@@ -806,22 +805,42 @@ public class OrderController {
         return returnObj;
     }
 
+    //售后
     @PostMapping("/after_sale")
     public ReturnObj after_sale(@RequestBody After_sale_DTO after_sale_dto){
         ReturnObj returnObj =new ReturnObj();
         String user_id = after_sale_dto.getUser_id();
         String order_id = after_sale_dto.getOrder_id();
         String after_sale_content = after_sale_dto.getAfter_sale_content();
-        String  getService_type = after_sale_dto.getService_type();
+        String  service_type_id = after_sale_dto.getService_type_id();
         List<String> imgList = after_sale_dto.getImgs();
         StringBuilder imgs= new StringBuilder();
         int sign=0;
         for(String item : imgList){
             sign++;
             imgs.append(item);
-            if(sign%2!=0)
+            if(sign!=imgList.size())
                 imgs.append(",");
         }
+        After_sale after_sale = new After_sale(String.valueOf(snowflakeIdWorker.nextId()),user_id,order_id,
+                after_sale_content,orderService.getServiceTypeById(service_type_id),imgs.toString(),
+                after_sale_dto.getRefund_price(),after_sale_dto.getRefund_reason());
+        if(orderService.setAfterSale(after_sale)){
+            Order_Status order_status = new Order_Status();
+            order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));  //雪花算法生成id
+            order_status.setOrder_id(order_id);
+            order_status.setStatus_description(orderService.findStatusById("10").getStatus_description());
+            List<Order_Status> order_statusList = orderService.getAllStatusById(order_id);
+            returnObj.setData("");
+            returnObj.setCode("200");
+            returnObj.setMsg("修改成功");
+        }
+        else{
+            returnObj.setCode("500");
+            returnObj.setMsg("添加失败");
+            returnObj.setData(false);
+        }
+
 
         return returnObj;
     }
