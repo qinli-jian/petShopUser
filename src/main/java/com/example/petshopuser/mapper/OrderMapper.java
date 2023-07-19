@@ -2,6 +2,7 @@ package com.example.petshopuser.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.petshopuser.entity.*;
+import com.example.petshopuser.entity.DTO.After_sale_DTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -33,4 +34,6 @@ public interface OrderMapper extends BaseMapper<Order> {
     List<String> getOrderIdsByUId(String user_id);
 
     Address getAddressById(String id);
+
+    Boolean setAfterSale(After_sale_DTO after_sale_dto);
 }
