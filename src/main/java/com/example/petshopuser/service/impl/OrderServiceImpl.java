@@ -4,6 +4,7 @@ import com.example.petshopuser.entity.*;
 import com.example.petshopuser.entity.DTO.After_sale_DTO;
 import com.example.petshopuser.mapper.OrderMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.crypto.interfaces.PBEKey;
@@ -23,6 +24,7 @@ public class OrderServiceImpl {
         return orderMapper.getAllStatusById(order_id);
     }
 
+    @Transactional
     public boolean putOrder(Order order){return orderMapper.putOrder(order);}
 
     public boolean putOrderStatus(Order_Status order_status){return orderMapper.putOrderStatus(order_status);}

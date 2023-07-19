@@ -6,6 +6,7 @@ import com.example.petshopuser.entity.DTO.OrderDTO;
 import com.example.petshopuser.entity.DTO.OrderOneDTO;
 import com.example.petshopuser.service.impl.CommodityServiceImpl;
 import com.example.petshopuser.service.impl.OrderServiceImpl;
+import com.example.petshopuser.service.impl.ShopCartServiceImpl;
 import com.example.petshopuser.utils.SnowflakeIdWorker;
 
 
@@ -29,6 +30,8 @@ public class OrderController {
     private OrderServiceImpl orderService;
     @Resource
     private CommodityServiceImpl commodityService;
+    @Resource
+    private ShopCartServiceImpl shopCartService;
 
     public OrderController(SnowflakeIdWorker snowflakeIdWorker) {
         this.snowflakeIdWorker = snowflakeIdWorker;
@@ -280,7 +283,7 @@ public class OrderController {
 
     //批量添加订单
     @PostMapping("/create_all")
-    public ReturnObj createOrderAll(@RequestBody List<OrderOneDTO> orderDTOList){
+    public ReturnObj createOrderAll(@RequestBody List<OrderOneDTO> orderDTOList ){
         ReturnObj returnObj = new ReturnObj();
         List<Map<String,Object>> ReturnDataList = new ArrayList<>();
         String order_id = String.valueOf(snowflakeIdWorker.nextId());
@@ -335,7 +338,13 @@ public class OrderController {
             order.setTotal_price(price);
             if(!orderService.putOrder(order)){
                 returnObj.setCode("500");
-                returnObj.setMsg("error");
+                returnObj.setMsg("订单添加失败");
+                returnObj.setData(false);
+                return returnObj;
+            }
+            if(shopCartService.deleteShopCart(orderDTO.getShop_cart_id())==0){
+                returnObj.setCode("500");
+                returnObj.setMsg("购物车删除失败");
                 returnObj.setData(false);
                 return returnObj;
             }
@@ -830,10 +839,12 @@ public class OrderController {
             order_status.setStatus_id(String.valueOf(snowflakeIdWorker.nextId()));  //雪花算法生成id
             order_status.setOrder_id(order_id);
             order_status.setStatus_description(orderService.findStatusById("10").getStatus_description());
-            List<Order_Status> order_statusList = orderService.getAllStatusById(order_id);
-            returnObj.setData("");
-            returnObj.setCode("200");
-            returnObj.setMsg("修改成功");
+            if(orderService.putOrderStatus(order_status)) {
+                List<Order_Status> order_statusList = orderService.getAllStatusById(order_id);
+                returnObj.setData(order_statusList);
+                returnObj.setCode("200");
+                returnObj.setMsg("修改成功");
+            }
         }
         else{
             returnObj.setCode("500");
