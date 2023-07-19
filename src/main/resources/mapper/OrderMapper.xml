@@ -41,7 +41,7 @@
         <result column="create_time" property="create_time"/>
     </resultMap>
     <select id="getAllStatusById" resultMap="getAllStatusByIdDTO">
-        select * from order_status where order_id = #{order_id} order by create_time
+        select * from order_status where order_id = #{order_id} order by create_time DESC
     </select>
 
     <insert id="putOrder">
@@ -107,4 +107,9 @@
     <delete id="deleteOrderStatusByOrderId">
         delete from order_status where order_id = #{order_id}
     </delete>
+
+    <insert id="setAfterSale">
+        insert into after_sale(after_sale_id,user_id,order_id,service_type,after_sale_content,imgs)
+        values(#{after_sale_id},#{user_id},#{order_id},#{service_type},#{after_sale_content},#{imgs})
+    </insert>
 </mapper>
