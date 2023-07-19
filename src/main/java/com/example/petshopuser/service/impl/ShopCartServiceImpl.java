@@ -15,10 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.sql.Wrapper;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ShopCartServiceImpl {
@@ -107,8 +104,38 @@ public class ShopCartServiceImpl {
 
     public int insert_shopCart(String user_id,ArrayList<Map<String, String>> infoList) {
         String id = String.valueOf(snowflakeIdWorker.nextId());
-        int f = shopCartMapper.batchInsertToShopCar(id,user_id,infoList);
-        return f;
+        ArrayList<Integer> remove_id = new ArrayList<Integer>();
+        for(int i = 0;i<infoList.size();i++){
+            Map<String, String> item = infoList.get(i);
+            System.out.println(item);
+            ShopCart shopCart = shopCartMapper.getShopCartBy_userId_commodityId_specification_priceId(user_id,item.get("commodity_id"),item.get("specification_price_id"));
+            System.out.println(shopCart);
+            if(shopCart!=null){
+                System.out.println("有重复的");
+                shopCart.setAmount(shopCart.getAmount()+Integer.valueOf(item.get("amount")));
+                shopCartMapper.updateById(shopCart);
+                remove_id.add(i);
+            }
+        }
+        // 使用Collections.sort()方法和自定义比较器实现从大到小排序
+        Collections.sort(remove_id, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer num1, Integer num2) {
+                // 注意：这里返回的比较结果要进行倒序
+                return num2.compareTo(num1);
+            }
+        });
+        for (int re_id :
+                remove_id) {
+            infoList.remove(re_id);
+        }
+        if(infoList.size()>0){
+            int f = shopCartMapper.batchInsertToShopCar(id,user_id,infoList);
+            return f;
+        }else{
+            return 1;
+        }
+
     }
 
     public int update_shopcart(ShopCart shopCart) {
